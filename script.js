@@ -375,7 +375,7 @@ function handlePasswordChange(event) {
 }
 
 function viewLoginHistory() {
-    showNotification('Login History:\n- Today 10:30 AM\n- Yesterday 3:45 PM\n- July 3rd 9:15 AM', 'info');
+    showNotification('Login History:\n- Today 10:30 AM\n- Yesterday 3:45 PM\n-', 'info');
 }
 
 function savePreferences() {
