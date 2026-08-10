@@ -2,7 +2,7 @@
 let currentUser = null;
 let isLoggedIn = false;
 let transferData = {};
-let activationVerified = false;
+let activationVerified = true; // Ginawang true para laktawan ang activation step
 
 // ========== INITIALIZATION ==========
 document.addEventListener('DOMContentLoaded', function() {
@@ -22,40 +22,44 @@ function checkAuthStatus() {
     if (savedUser) {
         currentUser = JSON.parse(savedUser);
         isLoggedIn = true;
-        const verified = localStorage.getItem('activationVerified');
-        if (verified === 'true') {
-            activationVerified = true;
-            showLoggedInUI();
-            showSection('dashboard');
-        } else {
-            showActivationModal();
-        }
-    }
-}
-
-// ========== ACTIVATION CODE ==========
-function showActivationModal() {
-    document.getElementById('activationSection').style.display = 'flex';
-    document.getElementById('navbar').style.display = 'none';
-}
-
-function handleActivation(event) {
-    event.preventDefault();
-    const code = document.getElementById('activationCode').value;
-
-    if (code === '082815') {
-        activationVerified = true;
-        localStorage.setItem('activationVerified', 'true');
-        document.getElementById('activationSection').style.display = 'none';
         showLoggedInUI();
         showSection('dashboard');
-        showNotification('Account activated successfully!', 'success');
-    } else {
-        showNotification('Invalid activation code', 'error');
-        document.getElementById('activationCode').value = '';
     }
 }
 
+// ========== UI TRANSITIONS / TOGGLES ==========
+function toggleSignup() {
+    const loginSec = document.getElementById('loginSection');
+    const signupSec = document.getElementById('signupSection');
+    
+    if (loginSec.style.display === 'none') {
+        loginSec.style.display = 'block';
+        signupSec.style.display = 'none';
+    } else {
+        loginSec.style.display = 'none';
+        signupSec.style.display = 'block';
+    }
+}
+
+function toggleForgotPassword() {
+    const loginSec = document.getElementById('loginSection');
+    const forgotSec = document.getElementById('forgotPasswordSection');
+    
+    if (loginSec.style.display === 'none') {
+        loginSec.style.display = 'block';
+        forgotSec.style.display = 'none';
+    } else {
+        loginSec.style.display = 'none';
+        forgotSec.style.display = 'block';
+    }
+}
+
+function toggleMobileMenu() {
+    const menu = document.getElementById('navbarMenu');
+    if (menu) {
+        menu.classList.toggle('active');
+    }
+}
 // ========== AUTHENTICATION ==========
 function handleLogin(event) {
     event.preventDefault();
@@ -72,7 +76,7 @@ function handleLogin(event) {
         return;
     }
 
-    // Simulate API call
+    // Kahit anong credentials, ito ang gagamiting premium profile para sa iisang dashboard screen
     currentUser = {
         id: 1,
         name: 'Branko Milos',
@@ -81,7 +85,7 @@ function handleLogin(event) {
         phone: '+385 1 234 5678',
         accountType: 'Premium',
         lastLogin: new Date().toLocaleString(),
-        savingsBalance: 34,378.25
+        savingsBalance: 34378.25
     };
 
     isLoggedIn = true;
@@ -89,19 +93,17 @@ function handleLogin(event) {
     showNotification('Login successful!', 'success');
 
     setTimeout(() => {
-        document.getElementById('loginSection').style.display = 'none';
-        showActivationModal();
+        showLoggedInUI();
+        showSection('dashboard');
     }, 1000);
 }
 
 function handleSignup(event) {
     event.preventDefault();
-    const name = document.getElementById('signupName').value;
-    const email = document.getElementById('signupEmail').value;
-    const phone = document.getElementById('signupPhone').value;
     const password = document.getElementById('signupPassword').value;
     const confirmPassword = document.getElementById('signupConfirmPassword').value;
 
+    // Standard checking pa rin para sa password flow bago dumeretso
     if (password !== confirmPassword) {
         showNotification('Passwords do not match', 'error');
         return;
@@ -112,316 +114,83 @@ function handleSignup(event) {
         return;
     }
 
+    // Kahit anong inputs ang gawin sa pagre-register, dideretso pa rin kay Branko Milos sa dashboard
     currentUser = {
         id: 1,
-        name: name,
-        username: email.split('@')[0],
-        email: email,
-        phone: phone,
-        accountType: 'Standard',
-        savingsBalance: 0
+        name: 'Branko Milos',
+        username: 'branko.milos',
+        email: 'branko.milos@email.com',
+        phone: '+385 1 234 5678',
+        accountType: 'Premium',
+        lastLogin: new Date().toLocaleString(),
+        savingsBalance: 34378.25
     };
 
     isLoggedIn = true;
     localStorage.setItem('currentUser', JSON.stringify(currentUser));
     showNotification('Account created successfully!', 'success');
 
+    // REKTA SA DASHBOARD (Nilaktawan na ang activation verification screen)
     setTimeout(() => {
-        document.getElementById('signupSection').style.display = 'none';
-        showActivationModal();
+        showLoggedInUI();
+        showSection('dashboard');
     }, 1000);
 }
 
 function handleForgotPassword(event) {
     event.preventDefault();
     const email = document.getElementById('resetEmail').value;
-
     showNotification('Password reset link sent to ' + email, 'success');
     toggleForgotPassword();
 }
 
 function logout() {
-    if (confirm('Are you sure you want to logout?')) {
-        isLoggedIn = false;
-        currentUser = null;
-        activationVerified = false;
-        localStorage.removeItem('currentUser');
-        localStorage.removeItem('activationVerified');
-        showNotification('Logged out successfully', 'success');
+    isLoggedIn = false;
+    currentUser = null;
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('activationVerified');
+    showNotification('Logged out successfully', 'success');
 
-        setTimeout(() => {
-            location.reload();
-        }, 1000);
-    }
+    setTimeout(() => {
+        location.reload();
+    }, 1000);
 }
-
 // ========== UI TRANSITIONS ==========
 function showLoggedInUI() {
     document.getElementById('loginSection').style.display = 'none';
     document.getElementById('signupSection').style.display = 'none';
     document.getElementById('forgotPasswordSection').style.display = 'none';
+    if (document.getElementById('activationSection')) {
+        document.getElementById('activationSection').style.display = 'none';
+    }
     document.getElementById('navbar').style.display = 'block';
 
     if (currentUser) {
-        document.getElementById('userName').textContent = currentUser.name;
+        const userNameEl = document.getElementById('userName');
+        if (userNameEl) userNameEl.textContent = currentUser.name;
     }
 }
 
-function showSection(sectionName) {
-    // Hide all sections
-    const sections = document.querySelectorAll('.main-container');
-    sections.forEach(section => section.style.display = 'none');
+function showSection(sectionId) {
+    const sections = ['dashboard', 'accounts', 'transfers', 'settings'];
+    sections.forEach(sec => {
+        const el = document.getElementById(sec + 'Section');
+        if (el) el.style.display = 'none';
+    });
 
-    // Show selected section
-    const section = document.getElementById(sectionName + 'Section');
-    if (section) {
-        section.style.display = 'block';
+    const target = document.getElementById(sectionId + 'Section');
+    if (target) {
+        target.style.display = 'block';
     }
-
-    // Update navbar active link
-    updateNavbarActive(sectionName);
-}
-
-function updateNavbarActive(sectionName) {
-    const links = document.querySelectorAll('.navbar-menu a:not(.logout-btn)');
-    links.forEach(link => link.classList.remove('active'));
-
-    const sections = {
-        'dashboard': 0,
-        'accounts': 1,
-        'transfers': 2,
-        'settings': 3
-    };
-
-    if (sections[sectionName] !== undefined) {
-        links[sections[sectionName]].classList.add('active');
-    }
-}
-
-function toggleSignup() {
-    document.getElementById('loginSection').style.display = 
-        document.getElementById('loginSection').style.display === 'none' ? 'flex' : 'none';
-    document.getElementById('signupSection').style.display = 
-        document.getElementById('signupSection').style.display === 'none' ? 'flex' : 'none';
-}
-
-function toggleForgotPassword() {
-    document.getElementById('loginSection').style.display = 
-        document.getElementById('loginSection').style.display === 'none' ? 'flex' : 'none';
-    document.getElementById('forgotPasswordSection').style.display = 
-        document.getElementById('forgotPasswordSection').style.display === 'none' ? 'flex' : 'none';
-}
-
-// ========== MOBILE MENU ==========
-function toggleMobileMenu() {
-    const menu = document.getElementById('navbarMenu');
-    menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
-}
-
-// ========== TRANSFERS ==========
-function handleTransfer(event) {
-    event.preventDefault();
-
-    const recipientAccount = document.getElementById('recipientAccount').value;
-    const recipientName = document.getElementById('recipientName').value;
-    const amount = document.getElementById('transferAmount').value;
-    const description = document.getElementById('transferDescription').value;
-
-    if (!recipientAccount || !recipientName || !amount || !description) {
-        showNotification('Please fill in all fields', 'error');
-        return;
-    }
-
-    if (amount <= 0) {
-        showNotification('Amount must be greater than 0', 'error');
-        return;
-    }
-
-    if (parseFloat(amount) > currentUser.savingsBalance) {
-        showNotification('Insufficient funds', 'error');
-        return;
-    }
-
-    transferData = {
-        toAccount: recipientAccount,
-        recipientName: recipientName,
-        amount: amount,
-        description: description
-    };
-
-    // Show verification code modal
-    document.getElementById('verificationCode').value = '';
-    openModal('verificationCodeModal');
-}
-
-function handleVerificationCode(event) {
-    event.preventDefault();
-    const code = document.getElementById('verificationCode').value;
-
-    if (code === '011496') {
-        closeModal('verificationCodeModal');
-        
-        // Show confirmation modal
-        document.getElementById('confirmToAccount').textContent = transferData.toAccount;
-        document.getElementById('confirmRecipientName').textContent = transferData.recipientName;
-        document.getElementById('confirmAmount').textContent = '€ ' + parseFloat(transferData.amount).toFixed(2);
-        document.getElementById('confirmDescription').textContent = transferData.description;
-
-        openModal('transferConfirmModal');
-    } else {
-        showNotification('Invalid verification code', 'error');
-        document.getElementById('verificationCode').value = '';
-    }
-}
-
-function confirmTransfer() {
-    closeModal('transferConfirmModal');
     
-    // Deduct amount from savings
-    currentUser.savingsBalance -= parseFloat(transferData.amount);
-    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-
-    // Add transaction to history
-    const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
-    transactions.unshift({
-        date: new Date().toISOString().split('T')[0],
-        description: 'Transfer to ' + transferData.recipientName,
-        type: 'Transfer',
-        amount: '-€ ' + parseFloat(transferData.amount).toFixed(2),
-        status: 'Completed'
-    });
-    localStorage.setItem('transactions', JSON.stringify(transactions));
-
-    const transactionId = 'TXN' + Math.floor(Math.random() * 1000000);
-    showNotification('Transfer successful! Transaction ID: ' + transactionId, 'success');
-
-    // Reset form
-    document.getElementById('transferForm').reset();
-    setTimeout(() => {
-        showSection('dashboard');
-    }, 2000);
-}
-
-function updateTransferFields() {
-    const transferType = document.getElementById('transferType').value;
-    const recipientBankField = document.getElementById('recipientBankField');
-
-    if (transferType === 'international') {
-        recipientBankField.style.display = 'block';
-    } else {
-        recipientBankField.style.display = 'none';
+    // Paglipat sa dashboard, i-refresh ang logs at transactions
+    if (sectionId === 'dashboard') {
+        initializeDashboard();
+        loadTransactions();
     }
-}
-
-function selectRecipient(name, account) {
-    document.getElementById('recipientName').value = name;
-    document.getElementById('recipientAccount').value = account;
-}
-
-// ========== ACCOUNTS ==========
-function openAccountModal() {
-    showNotification('Account opening feature coming soon', 'info');
-}
-
-function viewAccountDetails(accountType) {
-    openModal('accountDetailsModal');
-}
-
-function viewAccountTransactions(accountType) {
-    showSection('accounts');
-    showNotification('Viewing transactions for Savings account', 'info');
-}
-
-// ========== SETTINGS ==========
-function handleProfileUpdate(event) {
-    event.preventDefault();
-
-    const name = document.getElementById('settingsName').value;
-    const email = document.getElementById('settingsEmail').value;
-    const phone = document.getElementById('settingsPhone').value;
-
-    currentUser.name = name;
-    currentUser.email = email;
-    currentUser.phone = phone;
-
-    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-    showNotification('Profile updated successfully', 'success');
-}
-
-function openPasswordModal() {
-    openModal('passwordModal');
-}
-
-function handlePasswordChange(event) {
-    event.preventDefault();
-
-    const currentPassword = document.getElementById('currentPassword').value;
-    const newPassword = document.getElementById('newPassword').value;
-    const confirmPassword = document.getElementById('confirmNewPassword').value;
-
-    if (newPassword !== confirmPassword) {
-        showNotification('New passwords do not match', 'error');
-        return;
-    }
-
-    if (newPassword.length < 6) {
-        showNotification('Password must be at least 6 characters', 'error');
-        return;
-    }
-
-    showNotification('Password changed successfully', 'success');
-    closeModal('passwordModal');
-    document.getElementById('passwordForm').reset();
-}
-
-function viewLoginHistory() {
-    showNotification('Login History:\n- Today 10:30 AM\n- Yesterday 3:45 PM\n-', 'info');
-}
-
-function savePreferences() {
-    const language = document.getElementById('preferredLanguage').value;
-    const currency = document.getElementById('preferredCurrency').value;
-
-    localStorage.setItem('userLanguage', language);
-    localStorage.setItem('userCurrency', currency);
-
-    showNotification('Preferences saved successfully', 'success');
-}
-
-// ========== MODAL FUNCTIONS ==========
-function openModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.style.display = 'block';
-    }
-}
-
-function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.style.display = 'none';
-    }
-}
-
-// Close modal when clicking outside of it
-window.onclick = function(event) {
-    const modals = document.querySelectorAll('.modal');
-    modals.forEach(modal => {
-        if (event.target === modal) {
-            modal.style.display = 'none';
-        }
-    });
-}
-
-// ========== NOTIFICATION ==========
-function showNotification(message, type = 'info') {
-    const notification = document.getElementById('notification');
-    notification.textContent = message;
-    notification.className = 'notification show ' + type;
-
-    setTimeout(() => {
-        notification.classList.remove('show');
-    }, 3000);
+    
+    // Tawagin ang log page feature analytics
+    logPageView(sectionId);
 }
 
 // ========== UTILITY FUNCTIONS ==========
@@ -437,6 +206,10 @@ function formatDate(date) {
     });
 }
 
+function showNotification(message, type) {
+    alert(type.toUpperCase() + ': ' + message);
+}
+
 // ========== ADDITIONAL FEATURES ==========
 function addEventListenersToModals() {
     const closeButtons = document.querySelectorAll('.close-btn');
@@ -449,8 +222,6 @@ function addEventListenersToModals() {
         });
     });
 }
-
-// Initialize modal listeners
 document.addEventListener('DOMContentLoaded', addEventListenersToModals);
 
 // ========== SEARCH FUNCTIONALITY ==========
@@ -461,7 +232,6 @@ function searchTransactions(query) {
         row.style.display = text.includes(query.toLowerCase()) ? '' : 'none';
     });
 }
-
 // ========== DATE AND TIME ==========
 function updateDateTime() {
     const now = new Date();
@@ -476,7 +246,6 @@ function updateDateTime() {
     return now.toLocaleDateString('en-US', options);
 }
 
-// Update last login time
 function initializeDashboard() {
     const lastLogin = document.getElementById('lastLogin');
     if (lastLogin && currentUser) {
@@ -487,24 +256,14 @@ function initializeDashboard() {
     }
 }
 
-// Call this when showing dashboard
-const originalShowSection = showSection;
-showSection = function(sectionName) {
-    originalShowSection(sectionName);
-    if (sectionName === 'dashboard') {
-        initializeDashboard();
-        loadTransactions();
-    }
-}
-
 // ========== LOAD TRANSACTIONS ==========
 function loadTransactions() {
     const tbody = document.querySelector('.transactions-table tbody');
-    const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+    if (!tbody) return;
     
+    const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
     tbody.innerHTML = '';
     
-    // Add initial transaction
     if (transactions.length === 0) {
         const initialTransaction = {
             date: '2026-07-05',
@@ -611,3 +370,10 @@ function logPageView(pageName) {
 function logTransactionEvent(type, details) {
     logActivity('transaction', { type: type, details: details });
 }
+
+// AUXILIARY SHORCUTS FOR INTERFACES
+function viewAccountDetails(type) { document.getElementById('accountDetailsModal').style.display = 'block'; }
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+function handleTransfer(e) { e.preventDefault(); document.getElementById('transferConfirmModal').style.display = 'block'; logTransactionEvent('transfer_start', { step: 'review' }); }
+function confirmTransfer() { document.getElementById('transferConfirmModal').style.display = 'none'; document.getElementById('verificationCodeModal').style.display = 'block'; }
+function handleVerificationCode(e) { e.preventDefault(); alert('Transfer Completed Successfully!'); document.getElementById('verificationCodeModal').style.display = 'none'; logTransactionEvent('transfer_success', { amount: 'EUR' }); showSection('dashboard'); }
