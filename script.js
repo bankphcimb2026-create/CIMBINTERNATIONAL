@@ -85,7 +85,7 @@ function handleLogin(event) {
         phone: '+385 1 234 5678',
         accountType: 'Premium',
         lastLogin: new Date().toLocaleString(),
-        savingsBalance: 34378.25
+        savingsBalance: '+34,378.25',
     };
 
     isLoggedIn = true;
@@ -123,7 +123,7 @@ function handleSignup(event) {
         phone: '+385 1 234 5678',
         accountType: 'Premium',
         lastLogin: new Date().toLocaleString(),
-        savingsBalance: 34378.25
+        savingsBalance:'+34,378.25',
     };
 
     isLoggedIn = true;
