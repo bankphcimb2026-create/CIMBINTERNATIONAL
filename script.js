@@ -510,7 +510,7 @@ function loadTransactions() {
             date: '2026-07-05',
             description: 'Initial Deposit',
             type: 'Credit',
-            amount: '+€ 26,585.00',
+            amount: '+34,378.25',
             status: 'Completed'
         };
         tbody.innerHTML += `
