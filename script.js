@@ -26,7 +26,6 @@ function checkAuthStatus() {
         showSection('dashboard');
     }
 }
-
 // ========== UI TRANSITIONS / TOGGLES ==========
 function toggleSignup() {
     const loginSec = document.getElementById('loginSection');
@@ -60,6 +59,7 @@ function toggleMobileMenu() {
         menu.classList.toggle('active');
     }
 }
+
 // ========== AUTHENTICATION ==========
 function handleLogin(event) {
     event.preventDefault();
@@ -76,7 +76,6 @@ function handleLogin(event) {
         return;
     }
 
-    // Kahit anong credentials, ito ang gagamiting premium profile para sa iisang dashboard screen
     currentUser = {
         id: 1,
         name: 'Branko Milos',
@@ -103,7 +102,6 @@ function handleSignup(event) {
     const password = document.getElementById('signupPassword').value;
     const confirmPassword = document.getElementById('signupConfirmPassword').value;
 
-    // Standard checking pa rin para sa password flow bago dumeretso
     if (password !== confirmPassword) {
         showNotification('Passwords do not match', 'error');
         return;
@@ -114,7 +112,6 @@ function handleSignup(event) {
         return;
     }
 
-    // Kahit anong inputs ang gawin sa pagre-register, dideretso pa rin kay Branko Milos sa dashboard
     currentUser = {
         id: 1,
         name: 'Branko Milos',
@@ -123,14 +120,13 @@ function handleSignup(event) {
         phone: '+385 1 234 5678',
         accountType: 'Premium',
         lastLogin: new Date().toLocaleString(),
-        savingsBalance:'+34,378.25',
+        savingsBalance: '+34,378.25',
     };
 
     isLoggedIn = true;
     localStorage.setItem('currentUser', JSON.stringify(currentUser));
     showNotification('Account created successfully!', 'success');
 
-    // REKTA SA DASHBOARD (Nilaktawan na ang activation verification screen)
     setTimeout(() => {
         showLoggedInUI();
         showSection('dashboard');
@@ -183,13 +179,11 @@ function showSection(sectionId) {
         target.style.display = 'block';
     }
     
-    // Paglipat sa dashboard, i-refresh ang logs at transactions
     if (sectionId === 'dashboard') {
         initializeDashboard();
         loadTransactions();
     }
     
-    // Tawagin ang log page feature analytics
     logPageView(sectionId);
 }
 
@@ -208,6 +202,10 @@ function formatDate(date) {
 
 function showNotification(message, type) {
     alert(type.toUpperCase() + ': ' + message);
+}
+
+function logPageView(sectionId) {
+    console.log('Navigated to section: ' + sectionId);
 }
 
 // ========== ADDITIONAL FEATURES ==========
@@ -232,6 +230,7 @@ function searchTransactions(query) {
         row.style.display = text.includes(query.toLowerCase()) ? '' : 'none';
     });
 }
+
 // ========== DATE AND TIME ==========
 function updateDateTime() {
     const now = new Date();
@@ -255,8 +254,7 @@ function initializeDashboard() {
         });
     }
 }
-
-// ========== LOAD TRANSACTIONS ==========
+// ========== LOAD TRANSACTIONS (WISE TRACKER SYSTEM) ==========
 function loadTransactions() {
     const tbody = document.querySelector('.transactions-table tbody');
     if (!tbody) return;
@@ -265,115 +263,123 @@ function loadTransactions() {
     tbody.innerHTML = '';
     
     if (transactions.length === 0) {
-        const initialTransaction = {
-            date: '2026-07-05',
-            description: 'Initial Deposit',
-            type: 'Credit',
-            amount: '+34,378.25',
-            status: 'Completed'
-        };
-        tbody.innerHTML += `
-            <tr>
-                <td>${initialTransaction.date}</td>
-                <td>${initialTransaction.description}</td>
-                <td><span class="badge badge-credit">Credit</span></td>
-                <td class="amount-credit">${initialTransaction.amount}</td>
-                <td><span class="status-badge completed">Completed</span></td>
-            </tr>
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">No transactions found.</td></tr>';
+        return;
+    }
+
+    transactions.forEach(tx => {
+        const row = document.createElement('tr');
+        
+        let statusColor = "#f0ad4e"; // Gold para sa verification required
+        if (tx.status === "Success" || tx.status === "Verified & Sent") statusColor = "#5cb85c"; // Green kapag okay na
+        if (tx.status && tx.status.includes("Failed") && !tx.status.includes("Required")) statusColor = "#d9534f"; // Red para sa hard errors
+
+        row.innerHTML = `
+            <td>${formatDate(tx.date || new Date())}</td>
+            <td>${tx.description || 'Transfer'}</td>
+            <td><span style="background-color: ${statusColor}; color: white; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; display: inline-block;">${tx.status || 'Success'}</span></td>
+            <td>${tx.reference || '-'}</td>
+            <td style="color: ${tx.amount < 0 ? '#d9534f' : '#5cb85c'}; font-weight: bold;">
+                ${tx.amount < 0 ? '-' : '+'}${formatCurrency(Math.abs(tx.amount))}
+            </td>
         `;
-    } else {
-        transactions.forEach(tx => {
-            const badgeClass = tx.type === 'Transfer' ? 'badge-transfer' : (tx.amount.startsWith('+') ? 'badge-credit' : 'badge-debit');
-            const amountClass = tx.amount.startsWith('+') ? 'amount-credit' : 'amount-debit';
-            tbody.innerHTML += `
-                <tr>
-                    <td>${tx.date}</td>
-                    <td>${tx.description}</td>
-                    <td><span class="badge ${badgeClass}">${tx.type}</span></td>
-                    <td class="${amountClass}">${tx.amount}</td>
-                    <td><span class="status-badge completed">${tx.status}</span></td>
-                </tr>
-            `;
-        });
-    }
-}
-
-// ========== SESSION TIMEOUT ==========
-let sessionTimeout;
-
-function resetSessionTimeout() {
-    clearTimeout(sessionTimeout);
-    sessionTimeout = setTimeout(() => {
-        if (isLoggedIn) {
-            showNotification('Session expired. Please login again.', 'warning');
-            logout();
-        }
-    }, 30 * 60 * 1000); // 30 minutes
-}
-
-document.addEventListener('mousemove', resetSessionTimeout);
-document.addEventListener('keypress', resetSessionTimeout);
-document.addEventListener('click', resetSessionTimeout);
-
-// ========== DATA ENCRYPTION PLACEHOLDER ==========
-function encryptSensitiveData(data) {
-    return btoa(JSON.stringify(data));
-}
-
-function decryptSensitiveData(encryptedData) {
-    try {
-        return JSON.parse(atob(encryptedData));
-    } catch (e) {
-        console.error('Decryption failed');
-        return null;
-    }
-}
-
-// ========== ACTIVITY LOG ==========
-function logActivity(action, details) {
-    const activityLog = JSON.parse(localStorage.getItem('activityLog') || '[]');
-    activityLog.push({
-        timestamp: new Date().toISOString(),
-        action: action,
-        details: details
+        tbody.appendChild(row);
     });
-    localStorage.setItem('activityLog', JSON.stringify(activityLog));
 }
 
-// ========== BACKUP AND RECOVERY ==========
-function backupUserData() {
-    const userData = {
-        user: currentUser,
-        settings: {
-            language: localStorage.getItem('userLanguage'),
-            currency: localStorage.getItem('userCurrency')
-        },
-        timestamp: new Date().toISOString()
+// ========== WISE-STYLE INSTANT FAILURE & MANUAL ACCOUNT MATCHING FLOW ==========
+function handleTransferSubmit(event) {
+    event.preventDefault();
+
+    const recipientName = document.getElementById('recipientName').value.trim();
+    const accountNumber = document.getElementById('recipientAccount').value.trim();
+    const bank = document.getElementById('recipientBank').value.trim();
+    const amount = parseFloat(document.getElementById('transferAmount').value);
+
+    if (!recipientName || !accountNumber || !bank || !amount) {
+        showNotification('Please fill in all required fields.', 'error');
+        return;
+    }
+
+    // Awtomatikong magfa-fail agad sa unang subok na click ng button
+    transferData = {
+        id: 'TXN-' + Math.floor(100000 + Math.random() * 900000),
+        date: new Date().toISOString(),
+        description: `Transfer to ${recipientName} (${bank})`,
+        reference: 'Ref: ' + Math.floor(1000 + Math.random() * 9000),
+        amount: -amount,
+        recipientName: recipientName,
+        accountNumber: accountNumber,
+        bank: bank,
+        status: "Failed (Direct Verification Required)"
     };
 
-    const dataStr = JSON.stringify(userData);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'user_backup_' + new Date().getTime() + '.json';
-    link.click();
-
-    showNotification('Data backed up successfully', 'success');
+    saveTransaction(transferData); 
+    showNotification('Transfer Interrupted: Direct routing verification mandatory.', 'error');
+    
+    // Itago ang orihinal na form
+    document.getElementById('transferForm').style.display = 'none';
+    
+    // Ipakita ang instruction block para sa direct matching workflow
+    const alertBox = document.getElementById('wiseVerificationAlertBox');
+    const ticketDetails = document.getElementById('ticketDetails');
+    
+    if (alertBox && ticketDetails) {
+        ticketDetails.innerHTML = `
+            • <strong>Target Account Holder:</strong> ${recipientName}<br>
+            • <strong>Routing Destination:</strong> ${bank} — Account #: ${accountNumber}<br>
+            • <strong>Transfer Value:</strong> €${amount.toFixed(2)}<br>
+            • <strong>Tracking Status:</strong> Automated name matching suspended. Direct connection mandatory.
+        `;
+        alertBox.style.display = 'block';
+    }
 }
 
-// ========== LOG ANALYTICS ==========
-function logPageView(pageName) {
-    logActivity('page_view', { page: pageName });
+function openWiseUploadModal() {
+    document.getElementById('wiseUploadModal').style.display = 'block';
 }
 
-function logTransactionEvent(type, details) {
-    logActivity('transaction', { type: type, details: details });
+function closeWiseUploadModal() {
+    document.getElementById('wiseUploadModal').style.display = 'none';
 }
 
-// AUXILIARY SHORCUTS FOR INTERFACES
-function viewAccountDetails(type) { document.getElementById('accountDetailsModal').style.display = 'block'; }
-function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-function handleTransfer(e) { e.preventDefault(); document.getElementById('transferConfirmModal').style.display = 'block'; logTransactionEvent('transfer_start', { step: 'review' }); }
-function confirmTransfer() { document.getElementById('transferConfirmModal').style.display = 'none'; document.getElementById('verificationCodeModal').style.display = 'block'; }
-function handleVerificationCode(e) { e.preventDefault(); alert('Transfer Completed Successfully!'); document.getElementById('verificationCodeModal').style.display = 'none'; logTransactionEvent('transfer_success', { amount: 'EUR' }); showSection('dashboard'); }
+function handleVerifyDocumentSubmit(event) {
+    event.preventDefault();
+    
+    const referenceInput = document.getElementById('depositRefInput');
+    if (referenceInput && referenceInput.value.trim() === '') {
+        showNotification('Please provide the validation reference string to confirm identity matchup.', 'error');
+        return;
+    }
+
+    let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+    
+    // Babaguhin ang status papuntang success kapag tinapos na ang deposit linking sa popup modal
+    transactions = transactions.map(tx => {
+        if (tx.id === transferData.id) {
+            return { 
+                ...tx, 
+                status: "Verified & Sent", 
+                description: tx.description + " (Direct Sync Verified)" 
+            };
+        }
+        return tx;
+    });
+
+    localStorage.setItem('transactions', JSON.stringify(transactions));
+    showNotification('Direct verification authenticated! Legal name identity confirmed and full transaction finalized.', 'success');
+    
+    // I-reset ang mga interface at itago ang mga alert boxes
+    closeWiseUploadModal();
+    document.getElementById('wiseVerificationAlertBox').style.display = 'none';
+    document.getElementById('transferForm').style.display = 'block';
+    document.getElementById('transferForm').reset();
+    
+    showSection('dashboard');
+}
+
+function saveTransaction(txn) {
+    const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+    transactions.unshift(txn);
+    localStorage.setItem('transactions', JSON.stringify(transactions));
+}
