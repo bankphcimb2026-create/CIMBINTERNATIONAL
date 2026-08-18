@@ -26,6 +26,7 @@ function checkAuthStatus() {
         showSection('dashboard');
     }
 }
+
 // ========== UI TRANSITIONS / TOGGLES ==========
 function toggleSignup() {
     const loginSec = document.getElementById('loginSection');
@@ -60,7 +61,7 @@ function toggleMobileMenu() {
     }
 }
 
-// ========== AUTHENTICATION ==========
+// ========== AUTHENTICATION (DYNAMIC NAME) ==========
 function handleLogin(event) {
     event.preventDefault();
     const username = document.getElementById('loginUsername').value;
@@ -76,19 +77,24 @@ function handleLogin(event) {
         return;
     }
 
-    currentUser = {
-        id: 1,
-        name: 'Branko Milos',
-        username: username,
-        email: 'branko.milos@email.com',
-        phone: '+385 1 234 5678',
-        accountType: 'Premium',
-        lastLogin: new Date().toLocaleString(),
-        savingsBalance: '+34,378.25',
-    };
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+    } else {
+        currentUser = {
+            id: 1,
+            name: username, 
+            username: username,
+            email: username + '@email.com',
+            phone: '+385 1 234 5678',
+            accountType: 'Premium',
+            lastLogin: new Date().toLocaleString(),
+            savingsBalance: '+34,378.25',
+        };
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    }
 
     isLoggedIn = true;
-    localStorage.setItem('currentUser', JSON.stringify(currentUser));
     showNotification('Login successful!', 'success');
 
     setTimeout(() => {
@@ -96,9 +102,12 @@ function handleLogin(event) {
         showSection('dashboard');
     }, 1000);
 }
-
 function handleSignup(event) {
     event.preventDefault();
+    
+    const signupName = document.getElementById('signupName').value;
+    const email = document.getElementById('signupEmail').value;
+    const phone = document.getElementById('signupPhone').value;
     const password = document.getElementById('signupPassword').value;
     const confirmPassword = document.getElementById('signupConfirmPassword').value;
 
@@ -114,10 +123,10 @@ function handleSignup(event) {
 
     currentUser = {
         id: 1,
-        name: 'Branko Milos',
-        username: 'branko.milos',
-        email: 'branko.milos@email.com',
-        phone: '+385 1 234 5678',
+        name: signupName, // Ginawang dynamic para lumitaw ang tinype mong pangalan
+        username: email.split('@')[0],
+        email: email,
+        phone: phone || '+385 1 234 5678',
         accountType: 'Premium',
         lastLogin: new Date().toLocaleString(),
         savingsBalance: '+34,378.25',
@@ -151,6 +160,7 @@ function logout() {
         location.reload();
     }, 1000);
 }
+
 // ========== UI TRANSITIONS ==========
 function showLoggedInUI() {
     document.getElementById('loginSection').style.display = 'none';
@@ -162,8 +172,13 @@ function showLoggedInUI() {
     document.getElementById('navbar').style.display = 'block';
 
     if (currentUser) {
+        // Ina-update ang welcome text sa kaliwa ng dashboard
         const userNameEl = document.getElementById('userName');
         if (userNameEl) userNameEl.textContent = currentUser.name;
+
+        // Ina-update ang maliit na pangalan sa profile area sa kanan
+        const profileNameEl = document.querySelector('.profile-info .user-name');
+        if (profileNameEl) profileNameEl.textContent = currentUser.name;
     }
 }
 
@@ -207,7 +222,6 @@ function showNotification(message, type) {
 function logPageView(sectionId) {
     console.log('Navigated to section: ' + sectionId);
 }
-
 // ========== ADDITIONAL FEATURES ==========
 function addEventListenersToModals() {
     const closeButtons = document.querySelectorAll('.close-btn');
@@ -254,6 +268,7 @@ function initializeDashboard() {
         });
     }
 }
+
 // ========== LOAD TRANSACTIONS (WISE TRACKER SYSTEM) ==========
 function loadTransactions() {
     const tbody = document.querySelector('.transactions-table tbody');
@@ -301,7 +316,6 @@ function handleTransferSubmit(event) {
         return;
     }
 
-    // Awtomatikong magfa-fail agad sa unang subok na click ng button
     transferData = {
         id: 'TXN-' + Math.floor(100000 + Math.random() * 900000),
         date: new Date().toISOString(),
@@ -317,10 +331,8 @@ function handleTransferSubmit(event) {
     saveTransaction(transferData); 
     showNotification('Transfer Interrupted: Direct routing verification mandatory.', 'error');
     
-    // Itago ang orihinal na form
     document.getElementById('transferForm').style.display = 'none';
     
-    // Ipakita ang instruction block para sa direct matching workflow
     const alertBox = document.getElementById('wiseVerificationAlertBox');
     const ticketDetails = document.getElementById('ticketDetails');
     
@@ -354,7 +366,6 @@ function handleVerifyDocumentSubmit(event) {
 
     let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
     
-    // Babaguhin ang status papuntang success kapag tinapos na ang deposit linking sa popup modal
     transactions = transactions.map(tx => {
         if (tx.id === transferData.id) {
             return { 
@@ -369,13 +380,19 @@ function handleVerifyDocumentSubmit(event) {
     localStorage.setItem('transactions', JSON.stringify(transactions));
     showNotification('Direct verification authenticated! Legal name identity confirmed and full transaction finalized.', 'success');
     
-    // I-reset ang mga interface at itago ang mga alert boxes
     closeWiseUploadModal();
     document.getElementById('wiseVerificationAlertBox').style.display = 'none';
     document.getElementById('transferForm').style.display = 'block';
     document.getElementById('transferForm').reset();
     
     showSection('dashboard');
+}
+
+function deleteTransaction(txnId) {
+    let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+    transactions = transactions.filter(tx => tx.id !== txnId);
+    localStorage.setItem('transactions', JSON.stringify(transactions));
+    loadTransactions();
 }
 
 function saveTransaction(txn) {
