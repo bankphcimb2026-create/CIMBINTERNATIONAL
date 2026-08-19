@@ -3,161 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Commerce International Merchant Bankers</title>
+    <title>Commerce International Merchant Bankers | CIMB-INTER</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Font Awesome CDN para sa mga bank at visa icons -->
     <link rel="stylesheet" href="https://cloudflare.com">
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar" id="navbar">
+    <!-- NAVIGATION BAR -->
+    <nav class="navbar" id="navbar" style="display:none;">
         <div class="navbar-container">
             <div class="navbar-brand">
                 <i class="fas fa-university"></i>
                 <span>CIMB-INTER</span>
             </div>
             <ul class="navbar-menu" id="navbarMenu">
-                <li><a href="#" onclick="showSection('dashboard')">Dashboard</a></li>
-                <li><a href="#" onclick="showSection('accounts')">Accounts</a></li>
-                <li><a href="#" onclick="showSection('transfers')">Transfers</a></li>
-                <li><a href="#" onclick="showSection('settings')">Settings</a></li>
+                <li><a href="#" onclick="showSection('dashboardSection')">Dashboard</a></li>
+                <li><a href="#" onclick="showSection('accountsSection')">Accounts</a></li>
+                <li><a href="#" onclick="showSection('transfersSection')">Transfers</a></li>
+                <li><a href="#" onclick="showSection('settingsSection')">Settings</a></li>
                 <li><a href="#" onclick="logout()" class="logout-btn">Logout</a></li>
             </ul>
-            <div class="hamburger" id="hamburger">
+            <div class="hamburger" id="hamburger" onclick="toggleMenu()">
                 <span></span>
                 <span></span>
                 <span></span>
             </div>
         </div>
     </nav>
-
-    <!-- Activation Modal -->
-    <div id="activationSection" class="auth-container" style="display:none;">
-        <div class="auth-card">
-            <div class="auth-header">
-                <i class="fas fa-lock"></i>
-                <h1>Account Activation</h1>
-                <p>Enter the activation code sent to your email</p>
-            </div>
-
-            <form onsubmit="handleActivation(event)">
-                <div class="form-group">
-                    <label for="activationCode">Activation Code</label>
-                    <input type="text" id="activationCode" placeholder="Enter 6-digit code" maxlength="6" required>
-                </div>
-
-                <button type="submit" class="btn btn-primary btn-full">Activate Account</button>
-            </form>
-
-            <div class="auth-footer" style="justify-content: center;">
-                <p style="color: var(--text-light); font-size: 0.9rem;">Code: 082815</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Login Page -->
+    <!-- 1. LOGIN PAGE -->
     <div id="loginSection" class="auth-container">
         <div class="auth-card">
             <div class="auth-header">
-                <i class="fas fa-university"></i>
+                <i class="fas fa-university" style="color: #800000; font-size: 3rem;"></i>
                 <h1>CIMB-INTER</h1>
-                <p>Online Banking Platform</p>
+                <p>International Online Banking Platform</p>
             </div>
-
             <form id="loginForm" onsubmit="handleLogin(event)">
                 <div class="form-group">
                     <label for="loginUsername">Username or Email</label>
-                    <input type="text" id="loginUsername" placeholder="Enter your username" required>
+                    <input type="text" id="loginUsername" placeholder="Enter username (e.g., branko)" required>
                 </div>
-
                 <div class="form-group">
                     <label for="loginPassword">Password</label>
-                    <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                    <input type="password" id="loginPassword" placeholder="Enter password" required>
                 </div>
-
                 <div class="form-check">
                     <input type="checkbox" id="rememberMe">
                     <label for="rememberMe">Remember me</label>
                 </div>
-
-                <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+                <button type="submit" class="btn btn-primary btn-full" id="loginBtn">Sign In</button>
             </form>
-
             <div class="auth-footer">
                 <a href="#" onclick="toggleSignup()">Create Account</a>
                 <a href="#" onclick="toggleForgotPassword()">Forgot Password?</a>
             </div>
         </div>
     </div>
-    <!-- Signup Page -->
+
+    <!-- 2. SECURITY ACTIVATION PAGE -->
+    <div id="activationSection" class="auth-container" style="display:none;">
+        <div class="auth-card">
+            <div class="auth-header">
+                <i class="fas fa-shield-alt" style="color: #800000; font-size: 3rem;"></i>
+                <h1>Security Verification</h1>
+                <p>Enter the 6-digit authorization profile code</p>
+            </div>
+            <form onsubmit="handleActivation(event)">
+                <div class="form-group">
+                    <label for="activationCode">Verification Code</label>
+                    <input type="text" id="activationCode" placeholder="Enter 6-digit code" maxlength="6" style="text-align: center; font-size: 1.2rem; letter-spacing: 4px;" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full" id="activateBtn">Verify Identity</button>
+            </form>
+            <div class="auth-footer" style="justify-content: center;">
+                <p style="color: #666; font-size: 0.9rem;">Default Master Bypass Code: <strong style="color: #800000;">082815</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. SIGNUP PAGE -->
     <div id="signupSection" class="auth-container" style="display:none;">
         <div class="auth-card">
             <div class="auth-header">
-                <i class="fas fa-user-plus"></i>
+                <i class="fas fa-user-plus" style="color: #800000; font-size: 3rem;"></i>
                 <h1>Create Account</h1>
                 <p>Join CIMB-INTER Today</p>
             </div>
-
             <form id="signupForm" onsubmit="handleSignup(event)">
                 <div class="form-group">
                     <label for="signupName">Full Name</label>
                     <input type="text" id="signupName" placeholder="Enter your full name" required>
                 </div>
-
                 <div class="form-group">
                     <label for="signupEmail">Email Address</label>
                     <input type="email" id="signupEmail" placeholder="Enter your email" required>
                 </div>
-
-                <div class="form-group">
-                    <label for="signupPhone">Phone Number</label>
-                    <input type="tel" id="signupPhone" placeholder="Enter your phone number" required>
-                </div>
-
                 <div class="form-group">
                     <label for="signupPassword">Password</label>
                     <input type="password" id="signupPassword" placeholder="Create a password" required>
                 </div>
-
-                <div class="form-group">
-                    <label for="signupConfirmPassword">Confirm Password</label>
-                    <input type="password" id="signupConfirmPassword" placeholder="Confirm password" required>
-                </div>
-
                 <button type="submit" class="btn btn-primary btn-full">Create Account</button>
             </form>
-
-            <div class="auth-footer">
-                <a href="#" onclick="toggleSignup()">Back to Login</a>
+            <div class="auth-footer" style="justify-content: center;">
+                <a href="#" onclick="showSection('loginSection')">Back to Login</a>
             </div>
         </div>
     </div>
-    <!-- Forgot Password Page -->
+
+    <!-- 4. FORGOT PASSWORD PAGE -->
     <div id="forgotPasswordSection" class="auth-container" style="display:none;">
         <div class="auth-card">
             <div class="auth-header">
-                <i class="fas fa-lock"></i>
+                <i class="fas fa-key" style="color: #800000; font-size: 3rem;"></i>
                 <h1>Reset Password</h1>
-                <p>Enter your email to reset password</p>
+                <p>Enter your email to receive link</p>
             </div>
-
             <form id="forgotPasswordForm" onsubmit="handleForgotPassword(event)">
                 <div class="form-group">
                     <label for="resetEmail">Email Address</label>
                     <input type="email" id="resetEmail" placeholder="Enter your email" required>
                 </div>
-
                 <button type="submit" class="btn btn-primary btn-full">Send Reset Link</button>
             </form>
-
-            <div class="auth-footer">
-                <a href="#" onclick="toggleForgotPassword()">Back to Login</a>
+            <div class="auth-footer" style="justify-content: center;">
+                <a href="#" onclick="showSection('loginSection')">Back to Login</a>
             </div>
         </div>
     </div>
-
-    <!-- Main Dashboard -->
+    <!-- 5. MAIN DASHBOARD SECTION -->
     <div id="dashboardSection" class="main-container" style="display:none;">
-        <!-- Header with User Info -->
         <div class="dashboard-header">
             <div class="header-left">
                 <h1>Welcome, <span id="userName">Branko Milos</span>!</h1>
@@ -165,387 +139,188 @@
             </div>
             <div class="header-right">
                 <div class="user-profile">
-                    <img src="https://placeholder.com" alt="User Avatar" class="avatar">
+                    <img src="https://ui-avatars.com" alt="User Avatar" class="avatar">
                     <div class="profile-info">
                         <span class="user-name">Branko Milos</span>
-                        <span class="account-type">Premium Member</span>
+                        <span class="account-type"><i class="fas fa-check-circle" style="color: #28a745;"></i> Verified Profile</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Quick Stats -->
+        <!-- Dalawang display cards para sa mga Account -->
         <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                    <i class="fas fa-wallet"></i>
-                </div>
+            <div class="stat-card" style="border-left: 5px solid #800000;">
+                <div class="stat-icon" style="background: #800000; color: white;"><i class="fas fa-wallet"></i></div>
                 <div class="stat-content">
-                    <p class="stat-label">Savings Balance</p>
-                    <h2 class="stat-value" id="totalBalance">€ 34,378.25</h2>
+                    <p class="stat-label">Primary Savings (EUR)</p>
+                    <h2 class="stat-value" id="totalBalance">€ 34,427.00</h2>
+                    <p style="font-size: 0.8rem; color: #666; margin-top: 5px;">Type: Recovery Allocation Ledger</p>
+                </div>
+            </div>
+            <div class="stat-card" style="border-left: 5px solid #005691;">
+                <div class="stat-icon" style="background: #005691; color: white;"><i class="fab fa-cc-visa"></i></div>
+                <div class="stat-content">
+                    <p class="stat-label">Erste Visa Credit Card</p>
+                    <h2 class="stat-value">€ 5,000.00</h2>
+                    <p style="font-size: 0.8rem; color: #28a745; margin-top: 5px;">Status: Provisioned / Active</p>
                 </div>
             </div>
         </div>
-<!-- Quick Actions -->
+
         <div class="quick-actions">
-            <button class="action-btn" onclick="showSection('transfers')">
-                <i class="fas fa-paper-plane"></i>
-                <span>Send Money</span>
+            <button class="action-btn" onclick="showSection('transfersSection')">
+                <i class="fas fa-paper-plane"></i><span>Send Money</span>
             </button>
-            <button class="action-btn" onclick="showSection('accounts')">
-                <i class="fas fa-list"></i>
-                <span>View Accounts</span>
+            <button class="action-btn" onclick="showSection('accountsSection')">
+                <i class="fas fa-list"></i><span>View Accounts</span>
             </button>
         </div>
 
-        <!-- Recent Transactions -->
+        <!-- Recent Transactions Table Card -->
         <div class="section-card">
             <div class="section-header">
-                <h2>Recent Transactions</h2>
-                <a href="#" onclick="showSection('accounts')">View All</a>
+                <h2>Recent Transaction Log</h2>
+                <span style="font-size: 0.85rem; color: #666;">Historical Records</span>
             </div>
-            <table class="transactions-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Description</th>
-                        <th>Status</th>
-                        <th>Reference</th>
-                        <th>Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Injected dynamically by script.js -->
-                </tbody>
-            </table>
+            <div style="overflow-x: auto;">
+                <table class="transactions-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Reference ID</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>August 19, 2026 7:21 pm</td>
+                            <td>From WISE BRANKO MILOS</td>
+                            <td><span class="status-badge completed">Completed</span></td>
+                            <td>REF-WS8291A</td>
+                            <td style="color: #28a745; font-weight: bold;">+€ 47.50</td>
+                        </tr>
+                        <tr>
+                            <td>July 3, 2026</td>
+                            <td>RECOVERYFUNDS TRANSFER CLEARANCE</td>
+                            <td><span class="status-badge completed">Completed</span></td>
+                            <td>REC-098812X</td>
+                            <td style="color: #28a745; font-weight: bold;">+€ 34,378.25</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-
-    <!-- Accounts Section -->
+    <!-- 6. ACCOUNTS VIEW -->
     <div id="accountsSection" class="main-container" style="display:none;">
         <div class="section-header-main">
-            <h1>My Accounts</h1>
+            <h1>My Linked Assets</h1>
         </div>
-
         <div class="accounts-grid">
-            <!-- Savings Account -->
-            <div class="account-card-large">
+            <div class="account-card-large" style="border-top: 4px solid #800000;">
                 <div class="account-header">
                     <div>
-                        <h3>Savings Account</h3>
+                        <h3>Primary Savings Vault</h3>
                         <p class="account-number">1770 6762 99904</p>
                     </div>
-                    <i class="fas fa-piggy-bank account-icon"></i>
+                    <i class="fas fa-piggy-bank" style="color: #800000; font-size: 1.5rem;"></i>
                 </div>
                 <div class="account-balance">
-                    <span class="label">Available Balance</span>
-                    <h2 id="savingsBalance">€ 34,378.25</h2>
-                </div>
-                <div class="account-footer">
-                    <button class="btn btn-sm btn-outline" onclick="viewAccountDetails('savings')">Details</button>
-                    <button class="btn btn-sm btn-outline" onclick="viewAccountTransactions('savings')">Transactions</button>
+                    <span class="label">Available Ledger Balance</span>
+                    <h2>€ 34,427.00</h2>
                 </div>
             </div>
-        </div>
-
-        <!-- DAGDAG NA TAGALAYAN: Dito i-iinject ng javascript ang Erste Card mo nang walang nagagalaw sa ibang boxes -->
-        <div id="creditCardsDisplayBox"></div>
-
-        <!-- Account Details Modal -->
-        <div id="accountDetailsModal" class="modal" style="display:none;">
-            <div class="modal-content modal-lg">
-                <div class="modal-header">
-                    <h2>Account Details</h2>
-                    <button class="close-btn" onclick="closeModal('accountDetailsModal')">&times;</button>
+            <div class="account-card-large" style="border-top: 4px solid #005691;">
+                <div class="account-header">
+                    <div>
+                        <h3>Erste Visa Credit Line</h3>
+                        <p class="account-number">4532 1234 5678 9101</p>
+                    </div>
+                    <i class="fab fa-cc-visa" style="color: #005691; font-size: 1.5rem;"></i>
                 </div>
-                <div class="modal-body">
-                    <div class="detail-row">
-                        <span class="detail-label">Account Type:</span>
-                        <span class="detail-value">Savings Account</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Account Number:</span>
-                        <span class="detail-value">1770676299904</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">IBAN:</span>
-                        <span class="detail-value">HR2390001111222333444</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">BIC:</span>
-                        <span class="detail-value">SABAHRBX</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Current Balance:</span>
-                        <span class="detail-value" id="modalBalance">€ 34,378.25</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Account Status:</span>
-                        <span class="detail-value"><span class="status-badge completed">Active</span></span>
-                    </div>
+                <div class="account-balance">
+                    <span class="label">Approved Credit Limit</span>
+                    <h2>€ 5,000.00</h2>
+                </div>
+                <div style="margin-top: 15px; font-size: 0.85rem; color: #666; display: flex; justify-content: space-between;">
+                    <span>Expiry: 12/29</span>
+                    <span>Network: Verified</span>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Transfers Section -->
+
+    <!-- 7. TRANSFERS REGION -->
     <div id="transfersSection" class="main-container" style="display:none;">
         <div class="section-header-main">
-            <h1>Send Money</h1>
+            <h1>Cross-Border Wire Transfer</h1>
         </div>
-
         <div class="transfer-container">
             <div class="transfer-form-card">
-                <h2>New Transfer</h2>
-                <!-- Binago ang onsubmit para tumawag sa handleTransferSubmit na magti-trigger ng validation trap -->
+                <h2>New Remittance Form</h2>
                 <form id="transferForm" onsubmit="handleTransferSubmit(event)">
                     <div class="form-group">
-                        <label for="transferType">Transfer Type</label>
+                        <label for="transferType">Routing Classification</label>
                         <select id="transferType" required>
-                            <option value="">Select type</option>
-                            <option value="internal">Internal Transfer</option>
-                            <option value="domestic">Domestic Transfer</option>
-                            <option value="international" selected>International Transfer</option>
+                            <option value="international" selected>International Remittance Route</option>
                         </select>
                     </div>
-
-                    <div id="recipientFields">
-                        <div class="form-group">
-                            <label for="recipientAccount">Recipient Account Number / IBAN</label>
-                            <input type="text" id="recipientAccount" placeholder="Enter account number" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="recipientName">Recipient Full Name</label>
-                            <input type="text" id="recipientName" placeholder="Enter recipient name" required>
-                        </div>
-                        <div class="form-group" id="recipientBankField">
-                            <label for="recipientBank">Recipient Bank Name / BIC SWIFT</label>
-                            <input type="text" id="recipientBank" placeholder="Enter bank name" required>
-                        </div>
-                    </div>
-
                     <div class="form-group">
-                        <label for="transferAmount">Amount (EUR)</label>
-                        <input type="number" id="transferAmount" placeholder="0.00" step="0.01" required>
+                        <label for="recipientAccount">Recipient IBAN / Routing Code</label>
+                        <input type="text" id="recipientAccount" placeholder="Enter recipient routing index" required>
                     </div>
-
-                    <button type="submit" class="btn btn-primary btn-full">Proceed Transfer</button>
+                    <div class="form-group">
+                        <label for="recipientName">Beneficiary Full Legal Name</label>
+                        <input type="text" id="recipientName" placeholder="Enter legal target name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="transferAmount">Amount to Remit (EUR)</label>
+                        <input type="number" id="transferAmount" placeholder="0.00" step="0.01" min="1" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full" id="transferBtn">Process Allocation</button>
                 </form>
 
-                <!-- WISE ERROR SYSTEM PANEL (Lalabas agad pagkapindot ng Proceed button) -->
-                <div id="wiseVerificationAlertBox" style="display: none; margin-top: 20px; padding: 20px; border: 2px solid #e0ad4e; background-color: #fcf8e3; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); font-family: sans-serif;">
-                    <h4 style="color: #b17e10; margin-top: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;"><i class="fas fa-exclamation-triangle"></i> Transfer Paused: Legal Name Match Required</h4>
+                <!-- Ligtas na system validation interface control panel -->
+                <div id="complianceHoldAlertBox" style="display: none; margin-top: 20px; padding: 20px; border: 2px solid #800000; background-color: #fdf7f7; border-radius: 8px;">
+                    <h4 style="color: #800000; margin-top: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-exclamation-triangle"></i> Transaction Intercept: System Restrictions Applied
+                    </h4>
                     <p style="color: #333; font-size: 0.95rem; line-height: 1.5; margin-bottom: 15px;">
-                        Automated checks could not verify the target account ownership. To secure this route, you must deposit directly to your bank for the verification for checking the same info you must used your own bank.
+                        Ang transaksyon ay kasalukuyang naka-hold sa aming clearing portal. Upang mapanatili ang seguridad ng iyong pinansyal na profile, ang outbound remittance para sa asset recovery allocations ay nangangailangan ng karagdagang manual compliance parameters.
                     </p>
-                    
-                    <div style="background: #fff; padding: 15px; border-left: 4px solid #e0ad4e; margin-bottom: 20px; border-radius: 4px; border: 1px solid #eee;">
-                        <strong style="color: #555;">Verification Identification Ticket:</strong><br>
-                        <span id="ticketDetails" style="font-size: 0.9rem; line-height: 1.6; display:block; margin-top:5px; color: #444;"></span>
+                    <div style="background: #fff; padding: 15px; border-left: 4px solid #800000; margin-bottom: 20px; border-radius: 4px; border: 1px solid #edd; font-size: 0.9rem;">
+                        <strong>Error Log Code:</strong> <code>CIMB_CORE_LIMIT_HOLD_821</code><br>
+                        <strong>Description:</strong> Outbound pipeline execution suspended. Request did not satisfy the base transaction clearance metrics required for external non-signatory profiles.
                     </div>
-
-                    <p style="font-size: 0.88rem; color: #666; margin-bottom: 15px;">Once you have initiated the verification transaction from your active application portal, click the action link below.</p>
-                    <button type="button" class="btn btn-warning btn-full" onclick="openWiseUploadModal()" style="font-weight: bold; background: #e0ad4e; color: white; border: none; padding: 12px; border-radius: 4px; cursor: pointer; width: 100%;">
-                        I Have Processed the Direct Transfer Connection
-                    </button>
-                </div>
-            </div>
-
-            <!-- Recent Recipients -->
-            <div class="recipients-card">
-                <h3>Recent Recipients</h3>
-                <div class="recipient-list">
-                    <div class="recipient-item" onclick="selectRecipient('CIMB', '1770 6762 99904')">
-                        <div class="recipient-avatar">CIMB</div>
-                        <div class="recipient-info">
-                            <p class="recipient-name">CIMB</p>
-                            <p class="recipient-account">**** **** 9904</p>
-                        </div>
-                    </div>
-                    <div class="recipient-item" onclick="selectRecipient('CIMB', '1770 6762 99904')">
-                        <div class="recipient-avatar">JS</div>
-                        <div class="recipient-info">
-                            <p class="recipient-name">CIMB</p>
-                            <p class="recipient-account">**** **** 4695</p>
-                        </div>
-                    </div>
+                    <button type="button" class="btn btn-primary btn-full" onclick="resetToDashboard()" style="background: #555;">Return to Profile Overview</button>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Settings Section -->
+
+    <!-- 8. SETTINGS MODULE -->
     <div id="settingsSection" class="main-container" style="display:none;">
         <div class="section-header-main">
-            <h1>Settings</h1>
+            <h1>User Preferences</h1>
         </div>
-
         <div class="settings-container">
-            <!-- Profile Settings -->
             <div class="settings-card">
-                <h2><i class="fas fa-user"></i> Profile Settings</h2>
-                <form id="profileForm" onsubmit="handleProfileUpdate(event)">
-                    <div class="form-group">
-                        <label for="settingsName">Full Name</label>
-                        <input type="text" id="settingsName" value="Branko Milos" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="settingsEmail">Email Address</label>
-                        <input type="email" id="settingsEmail" value="branko.milos@email.com" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="settingsPhone">Phone Number</label>
-                        <input type="tel" id="settingsPhone" value="+639613245435" required>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                </form>
+                <h2><i class="fas fa-user"></i> Core Profile Info</h2>
+                <div class="form-group"><label>Display Label</label><input type="text" value="Branko Milos" readonly></div>
+                <div class="form-group"><label>Registered Routing Link</label><input type="email" value="branko.milos@email.com" readonly></div>
             </div>
-
-            <!-- Security Settings -->
             <div class="settings-card">
-                <h2><i class="fas fa-lock"></i> Security Settings</h2>
-                <div class="security-list">
-                    <div class="security-item">
-                        <div>
-                            <h3>Change Password</h3>
-                            <p>Update your account password</p>
-                        </div>
-                        <button class="btn btn-outline" onclick="openPasswordModal()">Change</button>
-                    </div>
-                    <div class="security-item">
-                        <div>
-                            <h3>Two-Factor Authentication</h3>
-                            <p>Add an extra layer of security to your account</p>
-                        </div>
-                        <button class="btn btn-outline">Enable</button>
-                    </div>
-                    <div class="security-item">
-                        <div>
-                            <h3>Login History</h3>
-                            <p>View your recent login activities</p>
-                        </div>
-                        <button class="btn btn-outline" onclick="viewLoginHistory()">View</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Notification Settings -->
-            <div class="settings-card">
-                <h2><i class="fas fa-bell"></i> Notification Settings</h2>
-                <div class="notification-list">
-                    <div class="notification-item">
-                        <div>
-                            <h3>Email Notifications</h3>
-                            <p>Receive alerts via email</p>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" checked>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="notification-item">
-                        <div>
-                            <h3>SMS Notifications</h3>
-                            <p>Receive alerts via SMS</p>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" checked>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="notification-item">
-                        <div>
-                            <h3>Transaction Alerts</h3>
-                            <p>Get notified of all transactions</p>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" checked>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Preferences -->
-            <div class="settings-card">
-                <h2><i class="fas fa-cog"></i> Preferences</h2>
+                <h2><i class="fas fa-cog"></i> Configuration</h2>
                 <div class="form-group">
-                    <label for="preferredLanguage">Language</label>
-                    <select id="preferredLanguage">
-                        <option value="en">English</option>
-                        <option value="hr">Croatian</option>
-                        <option value="de">German</option>
-                        <option value="tl">Tagalog</option>
-                    </select>
+                    <label>Preferred Currency Settlement</label>
+                    <select><option>EUR (€)</option></select>
                 </div>
-
-                <div class="form-group">
-                    <label for="preferredCurrency">Preferred Currency</label>
-                    <select id="preferredCurrency">
-                        <option value="eur">EUR (€)</option>
-                        <option value="usd">USD ($)</option>
-                        <option value="gbp">GBP (£)</option>
-                        <option value="php">PHP (₱)</option>
-                    </select>
-                </div>
-
-                <button class="btn btn-primary" onclick="savePreferences()">Save Preferences</button>
             </div>
         </div>
     </div>
-
-    <!-- Change Password Modal -->
-    <div id="passwordModal" class="modal" style="display:none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Change Password</h2>
-                <button class="close-btn" onclick="closeModal('passwordModal')">&times;</button>
-            </div>
-            <form id="passwordForm" onsubmit="handlePasswordChange(event)">
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="currentPassword">Current Password</label>
-                        <input type="password" id="currentPassword" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="newPassword">New Password</label>
-                        <input type="password" id="newPassword" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="confirmNewPassword">Confirm New Password</label>
-                        <input type="password" id="confirmNewPassword" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('passwordModal')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Update Password</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- WISE AUTHORIZATION TRANSCRIPT SYNC POPUP MODAL -->
-    <div id="wiseUploadModal" class="modal" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); z-index: 10000;">
-        <div class="modal-content" style="background: white; width: 90%; max-width: 460px; margin: 12% auto; padding: 25px; border-radius: 8px; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.15); font-family: sans-serif;">
-            <span class="close-btn" onclick="closeWiseUploadModal()" style="position: absolute; right: 20px; top: 15px; cursor: pointer; font-size: 24px; color: #aaa; font-weight: bold;">&times;</span>
-            <h3 style="margin-top: 0; color: #333; margin-bottom: 10px;">Authorize Intercept Match</h3>
-            <p style="color: #666; font-size: 0.9rem; line-height: 1.4; margin-bottom: 20px;">Input the unique deposit receipt reference lookup identifier code, system verification tracking hash, or transaction ledger string to synchronize profiles:</p>
-            
-            <form id="wiseVerificationForm" onsubmit="handleVerifyDocumentSubmit(event)">
-                <div class="form-group" style="margin-bottom: 20px;">
-                    <input type="text" id="depositRefInput" required placeholder="Enter Payment Reference Identifier" style="width:100%; padding:11px; border: 1px solid #ccc; border-radius: 4px; box-sizing:border-box; font-size: 0.95rem;">
-                </div>
-                <button type="submit" class="btn btn-primary btn-full" style="background: #00b050; color: white; padding: 12px; border: none; border-radius: 4px; width: 100%; font-weight: bold; cursor: pointer;">Authorize & Link Target Account Matchup</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Notification Toast -->
-    <div id="notification" class="notification"></div>
 
     <script src="script.js"></script>
 </body>
