@@ -468,56 +468,50 @@ function handleVerifyDocumentSubmit(event) {
     localStorage.setItem('transactions', JSON.stringify(transactions));
     showNotification('Direct verification authenticated! Legal name identity confirmed and full transaction finalized.', 'success');
     
-   // ========================================================
+ // ========================================================
 // NEW ADDITIONS (APPEND ONLY TO THE VERY BOTTOM OF THE FILE)
 // ========================================================
 
-// Automatically runs on page load to force inject everything properly
 document.addEventListener('DOMContentLoaded', function() {
-    executeForcedInterfaceRender();
-    setTimeout(() => {
-        executeForcedInterfaceRender();
-    }, 600); // 600ms delay as a safe backup for dynamic tab switching
+    executeForcedEnglishRender();
+    // Continuous loop to ensure components stay visible during page navigation
+    setInterval(executeForcedEnglishRender, 500);
 });
 
-function executeForcedInterfaceRender() {
-    // 1. FORCED CREDIT CARD RENDERING (JAVASCRIPT OVERLAY)
-    let accountsContainer = document.getElementById('accountsSection');
-    if (accountsContainer) {
+function executeForcedEnglishRender() {
+    // 1. FORCED VISUAL DISPLAY OF THE ERSTE VISA CREDIT CARD
+    let targetGrid = document.querySelector('.accounts-grid');
+    if (targetGrid) {
         let cardWrapper = document.getElementById('ersteCardWrapper');
         if (!cardWrapper) {
             cardWrapper = document.createElement('div');
             cardWrapper.id = 'ersteCardWrapper';
-            cardWrapper.style.marginTop = '25px';
-            cardWrapper.style.padding = '20px';
-            cardWrapper.style.border = '1px solid #e2e8f0';
-            cardWrapper.style.borderRadius = '12px';
-            cardWrapper.style.backgroundColor = '#ffffff';
-            cardWrapper.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)';
-            cardWrapper.style.fontFamily = 'inherit';
-            accountsContainer.appendChild(cardWrapper);
+            cardWrapper.className = 'account-card-large'; // Gagamitin ang mismong style ng Savings Account mo para magkapareho sila
+            cardWrapper.style.marginTop = '20px';
+            
+            targetGrid.appendChild(cardWrapper);
         }
         
         cardWrapper.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+            <div class="account-header">
                 <div>
-                    <h3 style="margin: 0 0 5px 0; font-size: 1.15rem; color: #1e293b; font-weight: 600;">ERSTE VISA CREDIT CARD</h3>
-                    <p style="margin: 0; font-size: 0.85rem; color: #64748b; font-family: monospace;">4084 8663 1028 8860</p>
+                    <h3>ERSTE VISA CREDIT CARD</h3>
+                    <p class="account-number">4084 8663 1028 8860</p>
                 </div>
-                <span style="background-color: #f59e0b; color: white; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">NEED TO VERIFY</span>
+                <i class="fas fa-credit-card account-icon"></i>
             </div>
-            <div style="margin-bottom: 15px;">
-                <span style="font-size: 0.85rem; color: #64748b; display: block; margin-bottom: 2px;">Available Balance</span>
-                <h2 style="margin: 0; font-size: 1.6rem; font-weight: 700; color: #1e293b;">€ 5,000.00</h2>
+            <div class="account-balance">
+                <span class="label" style="color: #ff9900; font-weight: bold;">NEED TO VERIFY</span>
+                <h2 style="margin-top: 5px;">€ 5,000.00</h2>
             </div>
-            <div style="display: flex; gap: 20px; font-size: 0.85rem; color: #475569; background-color: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #f1f5f9;">
-                <div><strong style="color: #64748b;">Valid Until:</strong> ***</div>
-                <div><strong style="color: #64748b;">CVV:</strong> ***</div>
+            <div class="account-footer" style="display: flex; gap: 15px; font-size: 0.85rem; color: #555; background: #fff; padding: 10px; border-radius: 4px; border: 1px inset #eee;">
+                <div><strong>Valid Until:</strong> ***</div>
+                <div><strong>CVV:</strong> ***</div>
             </div>
         `;
     }
 
-    // 2. FORCED TRANSACTION INJECTION TO OVERRIDE THE LIVE DISPLAY TABLE
+    // 2. FORCED ROW INJECTION FOR THE RECENT TRANSACTIONS TABLE
     const tbody = document.querySelector('.transactions-table tbody');
     if (tbody) {
         if (tbody.innerHTML.includes("No transactions found")) {
@@ -532,7 +526,7 @@ function executeForcedInterfaceRender() {
                 <td>Ref: WISE-4750</td>
                 <td style="color: #5cb85c; font-weight: bold;">+€ 47.50</td>
             `;
-            tbody.insertBefore(wiseRow, tbody.firstChild); // Pushes directly to the absolute top row of your log
+            tbody.insertBefore(wiseRow, tbody.firstChild);
         }
     }
 }
