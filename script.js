@@ -538,15 +538,17 @@ function initializeDefaultTransactions() {
 }
 
 // ==========================================
-// 6. INBOUND WISE TRANSACTION INJECTION
+// 6. INBOUND WISE TRANSACTION INJECTION (BUO AT MAY LOCK SYSTEM)
 // ==========================================
 function injectWiseTransaction() {
     let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+    
+    // Titingnan kung nakalista na ang transaksyon sa history upang hindi madoble
     const isWiseTxExist = transactions.some(tx => tx.reference === 'Ref: 7492' || tx.description.includes('WISE *******'));
 
     if (!isWiseTxExist) {
         const inboundWiseTx = {
-            id: 'SIM-' + Math.floor(100000 + Math.random() * 900000),
+            id: 'SIM-WISE4875',
             date: new Date().toISOString(),
             description: 'RECEIVED FROM BRANKO MILOS WISE *******',
             reference: 'Ref: 7492',
@@ -554,13 +556,23 @@ function injectWiseTransaction() {
             status: "Success"
         };
 
+        // Ipasok ang transaksyon sa unahan ng listahan
         transactions.unshift(inboundWiseTx);
         localStorage.setItem('transactions', JSON.stringify(transactions));
 
-        let currentBalances = getBalances();
-        currentBalances.savings += 48.75;
-        localStorage.setItem('simulatedBalances', JSON.stringify(currentBalances));
+        // LOCK SYSTEM: Titingnan kung naidagdag na ang pera sa balanse noon para ISANG BESES lang pumasok
+        let isMoneyAdded = localStorage.getItem('wiseMoneyAddedLock');
 
+        if (!isMoneyAdded) {
+            let currentBalances = getBalances();
+            currentBalances.savings += 48.75; // Idaragdag ang €48.75 sa Savings Account
+            localStorage.setItem('simulatedBalances', JSON.stringify(currentBalances));
+            
+            // I-lock ang system para hindi na maulit ang pagdagdag kapag nag-refresh ang user
+            localStorage.setItem('wiseMoneyAddedLock', 'true');
+        }
+
+        // I-refresh ang display sa screen
         refreshAllBalanceDisplays();
         loadTransactions();
     }
