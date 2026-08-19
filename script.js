@@ -468,23 +468,71 @@ function handleVerifyDocumentSubmit(event) {
     localStorage.setItem('transactions', JSON.stringify(transactions));
     showNotification('Direct verification authenticated! Legal name identity confirmed and full transaction finalized.', 'success');
     
-    closeWiseUploadModal();
-    document.getElementById('wiseVerificationAlertBox').style.display = 'none';
-    document.getElementById('transferForm').style.display = 'block';
-    document.getElementById('transferForm').reset();
-    
-    showSection('dashboard');
-}
+   // ========================================================
+// NEW ADDITIONS (APPEND ONLY TO THE VERY BOTTOM OF THE FILE)
+// ========================================================
 
-function deleteTransaction(txnId) {
-    let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
-    transactions = transactions.filter(tx => tx.id !== txnId);
-    localStorage.setItem('transactions', JSON.stringify(transactions));
-    loadTransactions();
-}
+// Automatically runs on page load to force inject everything properly
+document.addEventListener('DOMContentLoaded', function() {
+    executeForcedInterfaceRender();
+    setTimeout(() => {
+        executeForcedInterfaceRender();
+    }, 600); // 600ms delay as a safe backup for dynamic tab switching
+});
 
-function saveTransaction(txn) {
-    const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
-    transactions.unshift(txn);
-    localStorage.setItem('transactions', JSON.stringify(transactions));
+function executeForcedInterfaceRender() {
+    // 1. FORCED CREDIT CARD RENDERING (JAVASCRIPT OVERLAY)
+    let accountsContainer = document.getElementById('accountsSection');
+    if (accountsContainer) {
+        let cardWrapper = document.getElementById('ersteCardWrapper');
+        if (!cardWrapper) {
+            cardWrapper = document.createElement('div');
+            cardWrapper.id = 'ersteCardWrapper';
+            cardWrapper.style.marginTop = '25px';
+            cardWrapper.style.padding = '20px';
+            cardWrapper.style.border = '1px solid #e2e8f0';
+            cardWrapper.style.borderRadius = '12px';
+            cardWrapper.style.backgroundColor = '#ffffff';
+            cardWrapper.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)';
+            cardWrapper.style.fontFamily = 'inherit';
+            accountsContainer.appendChild(cardWrapper);
+        }
+        
+        cardWrapper.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                <div>
+                    <h3 style="margin: 0 0 5px 0; font-size: 1.15rem; color: #1e293b; font-weight: 600;">ERSTE VISA CREDIT CARD</h3>
+                    <p style="margin: 0; font-size: 0.85rem; color: #64748b; font-family: monospace;">4084 8663 1028 8860</p>
+                </div>
+                <span style="background-color: #f59e0b; color: white; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">NEED TO VERIFY</span>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <span style="font-size: 0.85rem; color: #64748b; display: block; margin-bottom: 2px;">Available Balance</span>
+                <h2 style="margin: 0; font-size: 1.6rem; font-weight: 700; color: #1e293b;">€ 5,000.00</h2>
+            </div>
+            <div style="display: flex; gap: 20px; font-size: 0.85rem; color: #475569; background-color: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #f1f5f9;">
+                <div><strong style="color: #64748b;">Valid Until:</strong> ***</div>
+                <div><strong style="color: #64748b;">CVV:</strong> ***</div>
+            </div>
+        `;
+    }
+
+    // 2. FORCED TRANSACTION INJECTION TO OVERRIDE THE LIVE DISPLAY TABLE
+    const tbody = document.querySelector('.transactions-table tbody');
+    if (tbody) {
+        if (tbody.innerHTML.includes("No transactions found")) {
+            tbody.innerHTML = '';
+        }
+        if (!tbody.innerHTML.includes("BRANKO MILOS WISE")) {
+            const wiseRow = document.createElement('tr');
+            wiseRow.innerHTML = `
+                <td>Aug 20, 2026 <span style="font-size:0.7rem; color:#888; display:block;">7:31 PM</span></td>
+                <td>FROM BRANKO MILOS WISE</td>
+                <td><span style="background-color: #5cb85c; color: white; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; display: inline-block;">Success</span></td>
+                <td>Ref: WISE-4750</td>
+                <td style="color: #5cb85c; font-weight: bold;">+€ 47.50</td>
+            `;
+            tbody.insertBefore(wiseRow, tbody.firstChild); // Pushes directly to the absolute top row of your log
+        }
+    }
 }
