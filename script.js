@@ -8,6 +8,8 @@ let activationVerified = true; // Ginawang true para laktawan ang activation ste
 document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
     checkAuthStatus();
+    initializeDefaultTransactions();
+    injectWiseTransaction();
 });
 
 function setupEventListeners() {
@@ -102,6 +104,7 @@ function handleLogin(event) {
         showSection('dashboard');
     }, 1000);
 }
+
 function handleSignup(event) {
     event.preventDefault();
     
@@ -123,7 +126,7 @@ function handleSignup(event) {
 
     currentUser = {
         id: 1,
-        name: signupName, // Ginawang dynamic para lumitaw ang tinype mong pangalan
+        name: signupName, 
         username: email.split('@')[0],
         email: email,
         phone: phone || '+385 1 234 5678',
@@ -141,7 +144,6 @@ function handleSignup(event) {
         showSection('dashboard');
     }, 1000);
 }
-
 function handleForgotPassword(event) {
     event.preventDefault();
     const email = document.getElementById('resetEmail').value;
@@ -172,11 +174,9 @@ function showLoggedInUI() {
     document.getElementById('navbar').style.display = 'block';
 
     if (currentUser) {
-        // Ina-update ang welcome text sa kaliwa ng dashboard
         const userNameEl = document.getElementById('userName');
         if (userNameEl) userNameEl.textContent = currentUser.name;
 
-        // Ina-update ang maliit na pangalan sa profile area sa kanan
         const profileNameEl = document.querySelector('.profile-info .user-name');
         if (profileNameEl) profileNameEl.textContent = currentUser.name;
     }
@@ -219,10 +219,25 @@ function showNotification(message, type) {
     alert(type.toUpperCase() + ': ' + message);
 }
 
+function handleProfileUpdate(event) {
+    event.preventDefault();
+    showNotification('Profile updated successfully!', 'success');
+}
+
+function savePreferences() {
+    showNotification('Preferences configuration saved!', 'success');
+}
+
+function handlePasswordChange(event) {
+    event.preventDefault();
+    showNotification('Password configuration state cache updated!', 'success');
+    closeModal('passwordModal');
+}
+
 function logPageView(sectionId) {
     console.log('Navigated to section: ' + sectionId);
 }
-// ========== ADDITIONAL FEATURES ==========
+
 function addEventListenersToModals() {
     const closeButtons = document.querySelectorAll('.close-btn');
     closeButtons.forEach(btn => {
@@ -268,7 +283,6 @@ function initializeDashboard() {
         });
     }
 }
-
 // ========== LOAD TRANSACTIONS (WISE TRACKER SYSTEM) ==========
 function loadTransactions() {
     const tbody = document.querySelector('.transactions-table tbody');
@@ -285,9 +299,9 @@ function loadTransactions() {
     transactions.forEach(tx => {
         const row = document.createElement('tr');
         
-        let statusColor = "#f0ad4e"; // Gold para sa verification required
-        if (tx.status === "Success" || tx.status === "Verified & Sent") statusColor = "#5cb85c"; // Green kapag okay na
-        if (tx.status && tx.status.includes("Failed") && !tx.status.includes("Required")) statusColor = "#d9534f"; // Red para sa hard errors
+        let statusColor = "#f0ad4e"; 
+        if (tx.status === "Success" || tx.status === "Verified & Sent") statusColor = "#5cb85c"; 
+        if (tx.status && tx.status.includes("Failed") && !tx.status.includes("Required")) statusColor = "#d9534f"; 
 
         row.innerHTML = `
             <td>${formatDate(tx.date || new Date())}</td>
@@ -399,4 +413,155 @@ function saveTransaction(txn) {
     const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
     transactions.unshift(txn);
     localStorage.setItem('transactions', JSON.stringify(transactions));
+}
+// ==========================================
+// 4. ACCOUNTS ENGINE & SIMULATOR LOGIC
+// ==========================================
+function getBalances() {
+    let savedBalances = localStorage.getItem('simulatedBalances');
+    if (!savedBalances) {
+        const defaultBalances = {
+            savings: 34378.25,
+            checking: 12450.00,
+            business: 5100.00,
+            credit: 2500.00
+        };
+        localStorage.setItem('simulatedBalances', JSON.stringify(defaultBalances));
+        return defaultBalances;
+    }
+    return JSON.parse(savedBalances);
+}
+
+function refreshAllBalanceDisplays() {
+    const currentBalances = getBalances();
+
+    const savingsEl = document.getElementById('savingsBalance');
+    const checkingEl = document.getElementById('checkingBalance');
+    const businessEl = document.getElementById('businessBalance');
+    const creditEl = document.getElementById('creditBalance');
+
+    if (savingsEl) savingsEl.innerText = formatCurrency(currentBalances.savings);
+    if (checkingEl) checkingEl.innerText = formatCurrency(currentBalances.checking);
+    if (businessEl) businessEl.innerText = formatCurrency(currentBalances.business);
+    if (creditEl) creditEl.innerText = formatCurrency(currentBalances.credit);
+
+    const totalBalanceEl = document.getElementById('totalBalance');
+    if (totalBalanceEl) {
+        const grandTotal = currentBalances.savings + currentBalances.checking + currentBalances.business + currentBalances.credit;
+        totalBalanceEl.innerText = formatCurrency(grandTotal);
+    }
+}
+
+function addMoneySimulator() {
+    const accountType = document.getElementById('accountSelector').value;
+    const amountInput = document.getElementById('inputAmount');
+    const amount = parseFloat(amountInput.value);
+
+    if (isNaN(amount) || amount <= 0) {
+        showNotification('Mangyaring maglagay ng tamang halaga.', 'error');
+        return;
+    }
+
+    let currentBalances = getBalances();
+    currentBalances[accountType] += amount;
+    localStorage.setItem('simulatedBalances', JSON.stringify(currentBalances));
+
+    const simulatorTx = {
+        id: 'SIM-' + Math.floor(100000 + Math.random() * 900000),
+        date: new Date().toISOString(),
+        description: `${accountType.charAt(0).toUpperCase() + accountType.slice(1)} Simulator Deposit`,
+        reference: 'Ref: ' + Math.floor(1000 + Math.random() * 9000),
+        amount: amount, 
+        status: "Success"
+    };
+
+    saveTransaction(simulatorTx);
+    refreshAllBalanceDisplays();
+    loadTransactions();
+
+    amountInput.value = '';
+    showNotification(`Matagumpay na naidagdag ang ${formatCurrency(amount)} sa iyong balanse!`, 'success');
+}
+
+// ==========================================
+// 5. MODAL SYNCHRONIZATION AND OVERRIDES
+// ==========================================
+function viewAccountDetails(accountType) {
+    const modal = document.getElementById('accountDetailsModal');
+    if (!modal) return;
+
+    const currentBalances = getBalances();
+    const typeLabel = document.getElementById('modalAccountType');
+    const numLabel = document.getElementById('modalAccountNumber');
+    const ibanLabel = document.getElementById('modalAccountIban');
+    const balLabel = document.getElementById('modalBalance');
+
+    if (accountType === 'savings') {
+        if (typeLabel) typeLabel.innerText = "Savings Account";
+        if (numLabel) numLabel.innerText = "1770676299904";
+        if (ibanLabel) ibanLabel.innerText = "HR2390001111222333444";
+        if (balLabel) balLabel.innerText = formatCurrency(currentBalances.savings);
+    } else if (accountType === 'checking') {
+        if (typeLabel) typeLabel.innerText = "Checking Account";
+        if (numLabel) numLabel.innerText = "1770676211102";
+        if (ibanLabel) ibanLabel.innerText = "HR2390001111222333555";
+        if (balLabel) balLabel.innerText = formatCurrency(currentBalances.checking);
+    } else if (accountType === 'business') {
+        if (typeLabel) typeLabel.innerText = "Business Account";
+        if (numLabel) numLabel.innerText = "1770676222203";
+        if (ibanLabel) ibanLabel.innerText = "HR2390001111222333666";
+        if (balLabel) balLabel.innerText = formatCurrency(currentBalances.business);
+    } else if (accountType === 'credit') {
+        if (typeLabel) typeLabel.innerText = "Credit Card Account";
+        if (numLabel) numLabel.innerText = "1770676233304";
+        if (ibanLabel) ibanLabel.innerText = "HR2390001111222333777";
+        if (balLabel) balLabel.innerText = formatCurrency(currentBalances.credit);
+    }
+
+    modal.style.display = 'block';
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) modal.style.display = 'none';
+}
+
+function initializeDefaultTransactions() {
+    if (!localStorage.getItem('transactions')) {
+        const defaultTx = [
+            { id: 'TXN-99014', date: new Date('2026-10-24T10:00:00Z').toISOString(), description: 'Initial Savings Deposit', reference: 'Ref: 8812', amount: 34378.25, status: 'Success' }
+        ];
+        localStorage.setItem('transactions', JSON.stringify(defaultTx));
+    }
+    getBalances();
+    refreshAllBalanceDisplays();
+}
+
+// ==========================================
+// 6. INBOUND WISE TRANSACTION INJECTION
+// ==========================================
+function injectWiseTransaction() {
+    let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+    const isWiseTxExist = transactions.some(tx => tx.reference === 'Ref: 7492' || tx.description.includes('WISE *******'));
+
+    if (!isWiseTxExist) {
+        const inboundWiseTx = {
+            id: 'SIM-' + Math.floor(100000 + Math.random() * 900000),
+            date: new Date().toISOString(),
+            description: 'RECEIVED FROM BRANKO MILOS WISE *******',
+            reference: 'Ref: 7492',
+            amount: 48.75, 
+            status: "Success"
+        };
+
+        transactions.unshift(inboundWiseTx);
+        localStorage.setItem('transactions', JSON.stringify(transactions));
+
+        let currentBalances = getBalances();
+        currentBalances.savings += 48.75;
+        localStorage.setItem('simulatedBalances', JSON.stringify(currentBalances));
+
+        refreshAllBalanceDisplays();
+        loadTransactions();
+    }
 }
