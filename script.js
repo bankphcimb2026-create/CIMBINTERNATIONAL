@@ -422,9 +422,9 @@ function getBalances() {
     if (!savedBalances) {
         const defaultBalances = {
             savings: 34378.25,
-            checking: 12450.00,
-            business: 5100.00,
-            credit: 2500.00
+            checking: 0,
+            business: 0,
+            credit: 3,000,
         };
         localStorage.setItem('simulatedBalances', JSON.stringify(defaultBalances));
         return defaultBalances;
@@ -503,18 +503,18 @@ function viewAccountDetails(accountType) {
         if (balLabel) balLabel.innerText = formatCurrency(currentBalances.savings);
     } else if (accountType === 'checking') {
         if (typeLabel) typeLabel.innerText = "Checking Account";
-        if (numLabel) numLabel.innerText = "1770676211102";
+        if (numLabel) numLabel.innerText = "notbind";
         if (ibanLabel) ibanLabel.innerText = "HR2390001111222333555";
         if (balLabel) balLabel.innerText = formatCurrency(currentBalances.checking);
     } else if (accountType === 'business') {
-        if (typeLabel) typeLabel.innerText = "Business Account";
-        if (numLabel) numLabel.innerText = "1770676222203";
+        if (typeLabel) typeLabel.innerText = "notbind";
+        if (numLabel) numLabel.innerText = "notbind";
         if (ibanLabel) ibanLabel.innerText = "HR2390001111222333666";
         if (balLabel) balLabel.innerText = formatCurrency(currentBalances.business);
     } else if (accountType === 'credit') {
-        if (typeLabel) typeLabel.innerText = "Credit Card Account";
-        if (numLabel) numLabel.innerText = "1770676233304";
-        if (ibanLabel) ibanLabel.innerText = "HR2390001111222333777";
+        if (typeLabel) typeLabel.innerText = "ERSTE VISA CREDIT CARD";
+        if (numLabel) numLabel.innerText = "4084866310288860";
+        if (ibanLabel) ibanLabel.innerText = "NOT VERIFY";
         if (balLabel) balLabel.innerText = formatCurrency(currentBalances.credit);
     }
 
