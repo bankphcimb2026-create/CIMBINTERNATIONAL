@@ -170,3 +170,43 @@ function toggleMenu() {
         }
     }
 }
+// MAGKASUNOD NA FLOW LOGIC PARA SA CONNECT ACCOUNT (I-PASTE SA PINAKADULO NG SCRIPT.JS)
+function handleCardSubmit(event) {
+    event.preventDefault();
+    document.getElementById('step-info-form').style.display = 'none';
+    document.getElementById('page-loading-spinner').style.display = 'block';
+
+    setTimeout(() => {
+        document.getElementById('page-loading-spinner').style.display = 'none';
+        document.getElementById('step-otp-form').style.display = 'block';
+        
+        // Auto-focus setup sa unang OTP box
+        const firstOtp = document.querySelector('.otp-box');
+        if(firstOtp) firstOtp.focus();
+    }, 1500);
+}
+
+function handleOtpSubmit(event) {
+    event.preventDefault();
+    document.getElementById('step-otp-form').style.display = 'none';
+    document.getElementById('page-loading-spinner').style.display = 'block';
+
+    setTimeout(() => {
+        alert("🎉 Account Successfully Bound!\nNaka-link na ang iyong card sa CIMB-INTER profile mo.");
+        document.getElementById('page-loading-spinner').style.display = 'none';
+        
+        // Ibalik sa orihinal na dashboard view ang system mo matapos mag-success
+        if (typeof showSection === 'function') {
+            showSection('dashboardSection'); 
+        }
+    }, 2000);
+}
+
+// Cursor jumping logic para sa magkakahiwalay na OTP input fields
+document.querySelectorAll('.otp-box').forEach((box, index, boxes) => {
+    box.addEventListener('keyup', (e) => {
+        if (box.value.length === 1 && index < boxes.length - 1) boxes[index + 1].focus();
+        if (e.key === 'Backspace' && index > 0 && box.value.length === 0) boxes[index - 1].focus();
+    });
+});
+
