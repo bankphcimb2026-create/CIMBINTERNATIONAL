@@ -35,6 +35,46 @@ body {
     z-index: 1000;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
+/* ================= IDAGDAG ITO SA PINAKABABA NG IYONG STYLE.CSS ================= */
+
+/* Inaayos ang layout ng 6 na OTP boxes para nakapila nang pahiga */
+#step-otp-form div {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+    margin-bottom: 25px;
+}
+
+/* Disenyo ng bawat indibidwal na kahon ng OTP */
+.otp-box {
+    width: 45px !important;
+    height: 50px !important;
+    font-size: 22px !important;
+    font-weight: bold !important;
+    text-align: center !important;
+    color: #800000 !important; /* Kulay ng font (tumutugma sa maroon ng CIMB mo) */
+    background-color: #ffffff !important;
+    border: 2px solid #ccc !important;
+    border-radius: 6px !important;
+    outline: none !important;
+    transition: all 0.2s ease;
+}
+
+/* Kulay ng border kapag kasalukuyang nagta-type sa loob ng kahon */
+.otp-box:focus {
+    border-color: #10b981 !important; /* Kulay berdeng border kapag active */
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.3) !important;
+}
+
+/* Inaalis ang arrow buttons sa loob ng OTP boxes kung sakaling maging number input */
+.otp-box::-webkit-outer-spin-button,
+.otp-box::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+/* ================= HANGGANG DITO LANG ================= */
+
 
 .navbar-container {
     display: flex;
