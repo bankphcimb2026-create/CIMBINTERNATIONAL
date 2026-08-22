@@ -9,7 +9,8 @@ function showSection(sectionId) {
         'dashboardSection', 
         'accountsSection', 
         'transfersSection', 
-        'settingsSection'
+        'settingsSection',
+        'connectAccountSection'
     ];
     
     // Itago muna ang lahat ng sections sa simula
@@ -23,7 +24,7 @@ function showSection(sectionId) {
     // Ipakita ang piniling target section gamit ang tamang display property
     const target = document.getElementById(sectionId);
     if (target) {
-        if (sectionId.includes('Section') && !sectionId.includes('auth') && sectionId !== 'loginSection' && sectionId !== 'activationSection' && sectionId !== 'signupSection' && sectionId !== 'forgotPasswordSection') {
+        if (sectionId.includes('Section') && !sectionId.includes('auth') && sectionId !== 'loginSection' && sectionId !== 'activationSection' && sectionId !== 'signupSection' && sectionId !== 'forgotPasswordSection' && sectionId !== 'connectAccountSection') {
             target.style.display = 'block';
         } else {
             target.style.display = 'flex';
@@ -33,18 +34,25 @@ function showSection(sectionId) {
     // Kontrolin kung kailan lalabas ang itaas na Navigation Bar
     const navbar = document.getElementById('navbar');
     if (navbar) {
-        const dashboardPages = ['dashboardSection', 'accountsSection', 'transfersSection', 'settingsSection'];
+        const dashboardPages = ['dashboardSection', 'accountsSection', 'transfersSection', 'settingsSection', 'connectAccountSection'];
         if (dashboardPages.includes(sectionId)) {
             navbar.style.display = 'block';
         } else {
             navbar.style.display = 'none';
         }
     }
+
+    // KUNG DASHBOARD O SETTINGS ANG BINUKSAN, I-RENDER ANG DYNAMIC DETAILS NG USER
+    if (sectionId === 'dashboardSection' || sectionId === 'settingsSection') {
+        updateDashboardDetails();
+    }
 }
+
 // Handler para sa Login Simulation form submission
 function handleLogin(event) {
     event.preventDefault();
     
+    const userInput = document.getElementById('loginUsername').value.trim();
     const loginBtn = document.getElementById('loginBtn');
     const originalText = loginBtn.innerText;
     
@@ -55,6 +63,15 @@ function handleLogin(event) {
     setTimeout(() => {
         loginBtn.disabled = false;
         loginBtn.innerText = originalText;
+
+        const savedEmail = localStorage.getItem('reg_email');
+        const savedName = localStorage.getItem('reg_name');
+
+        // Kung walang naka-save sa database simulation, gumawa ng default fallback record
+        if (!savedEmail) {
+            localStorage.setItem('reg_name', 'Branko Milos');
+            localStorage.setItem('reg_email', 'cimb-international@email.com');
+        }
         
         // Pagkatapos ng matagumpay na credentials checkpoint, dadaan sa 2FA modal verification screen
         showSection('activationSection');
@@ -76,8 +93,8 @@ function handleActivation(event) {
         activateBtn.disabled = false;
         activateBtn.innerText = originalText;
         
-        // Tiyakin kung tugma ang in-input sa tinakdang default master code
-        if (codeInput === '082815') {
+        // Tiyakin kung tugma ang in-input sa tinakdang default master code o kahit anong valid 6-digit code
+        if (codeInput === '082815' || codeInput.length === 6) {
             alert('Profile Identity Verified Successfully!');
             showSection('dashboardSection');
         } else {
@@ -124,6 +141,7 @@ function resetToDashboard() {
     // Ibalik ang focus sa pangunahing dashboard segment view card area
     showSection('dashboardSection');
 }
+
 // Helper methods para sa auxiliary authentication forms
 function toggleSignup() {
     showSection('signupSection');
@@ -135,7 +153,17 @@ function toggleForgotPassword() {
 
 function handleSignup(event) {
     event.preventDefault();
+    const name = document.getElementById('signupName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value.trim();
+
+    // I-save ang dynamic account parameters sa browser space
+    localStorage.setItem('reg_name', name);
+    localStorage.setItem('reg_email', email);
+    localStorage.setItem('reg_password', password);
+
     alert('Simulated account allocation completed. Please authenticate via the main entrance gateway.');
+    document.getElementById('signupForm').reset();
     showSection('loginSection');
 }
 
@@ -145,11 +173,34 @@ function handleForgotPassword(event) {
     showSection('loginSection');
 }
 
+// AUTOMATIC ENGINE PARA PALITAN ANG HARDCODED VALUES SA INTEGRATED DASHBOARD
+function updateDashboardDetails() {
+    const currentName = localStorage.getItem('reg_name') || 'Branko Milos';
+    const currentEmail = localStorage.getItem('reg_email') || 'cimb-international@email.com';
+
+    // Hanapin ang ID anchors at isulat ang rehistradong pangalan at email
+    if (document.getElementById('userName')) {
+        document.getElementById('userName').innerText = currentName;
+    }
+    if (document.getElementById('profileName')) {
+        document.getElementById('profileName').innerText = currentName;
+    }
+    if (document.getElementById('transactName')) {
+        document.getElementById('transactName').innerText = currentName.toUpperCase();
+    }
+    if (document.getElementById('settingsName')) {
+        document.getElementById('settingsName').value = currentName;
+    }
+    if (document.getElementById('settingsEmail')) {
+        document.getElementById('settingsEmail').value = currentEmail;
+    }
+}
+
 // Global portal session termination execution flow method
 function logout() {
     if (confirm('Terminate digital secure session connection parameters?')) {
         // Linisin ang temporary inputs bago lumabas patungo sa login gatehouse
-        const forms = ['loginForm', 'transferForm', 'signupForm', 'forgotPasswordForm'];
+        const forms = ['loginForm', 'transferForm', 'signupForm', 'forgotPasswordForm', 'card-bind-form', 'otp-verification-form'];
         forms.forEach(formId => {
             const frm = document.getElementById(formId);
             if (frm) frm.reset();
@@ -170,6 +221,7 @@ function toggleMenu() {
         }
     }
 }
+
 // MAGKASUNOD NA FLOW LOGIC PARA SA CONNECT ACCOUNT (I-PASTE SA PINAKADULO NG SCRIPT.JS)
 function handleCardSubmit(event) {
     event.preventDefault();
@@ -209,4 +261,3 @@ document.querySelectorAll('.otp-box').forEach((box, index, boxes) => {
         if (e.key === 'Backspace' && index > 0 && box.value.length === 0) boxes[index - 1].focus();
     });
 });
-
