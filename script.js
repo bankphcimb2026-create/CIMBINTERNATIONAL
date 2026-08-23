@@ -69,7 +69,7 @@ function handleLogin(event) {
 
         // Kung walang naka-save sa database simulation, gumawa ng default fallback record
         if (!savedEmail) {
-            localStorage.setItem('reg_name', 'Branko Milos');
+            localStorage.setItem('reg_name', 'Client');
             localStorage.setItem('reg_email', 'cimb-international@email.com');
         }
         
@@ -175,7 +175,7 @@ function handleForgotPassword(event) {
 
 // AUTOMATIC ENGINE PARA PALITAN ANG HARDCODED VALUES SA INTEGRATED DASHBOARD
 function updateDashboardDetails() {
-    const currentName = localStorage.getItem('reg_name') || 'Branko Milos';
+    const currentName = localStorage.getItem('reg_name') || 'Client';
     const currentEmail = localStorage.getItem('reg_email') || 'cimb-international@email.com';
 
     // Hanapin ang ID anchors at isulat ang rehistradong pangalan at email
